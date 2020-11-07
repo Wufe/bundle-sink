@@ -7,7 +7,7 @@
 		<Authors>Simone Bembi</Authors>
 		<Description>Manage multiple webpack entries within an ASPNET Core application.</Description>
 		<ProjectUrl>https://github.com/wufe/bundle-sink</ProjectUrl>
-		<License type="expression">MIT</License>
+		<License>MIT</License>
 	</PropertyGroup>
 
 	<ItemGroup>
