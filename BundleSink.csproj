@@ -3,7 +3,7 @@
 	<PropertyGroup>
 		<TargetFramework>netcoreapp3.1</TargetFramework>
 		<PackageId>BundleSink</PackageId>
-		<Version>1.0.0</Version>
+		<Version>1.1.0</Version>
 		<Authors>Simone Bembi</Authors>
 		<Description>Manage multiple webpack entries within an ASPNET Core application.</Description>
 		<ProjectUrl>https://github.com/wufe/bundle-sink</ProjectUrl>
