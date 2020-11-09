@@ -20,10 +20,31 @@ namespace BundleSink.TagHelpers
         public override void Process(TagHelperContext context, TagHelperOutput output)
         {
             output.TagName = null;
-            if (context.AllAttributes.TryGetAttribute("name", out var attribute)) {
-                var requestedEntryName = attribute.Value.ToString();
-                if (_webpackManifest.Value.ContainsKey(requestedEntryName)) {
-                    _webpackViewData.AddEntry(requestedEntryName);
+            if (context.AllAttributes.TryGetAttribute("name", out var name)) {
+                var requestedEntryModel = name.Value.ToString();
+                if (_webpackManifest.Value.ContainsKey(requestedEntryModel)) {
+
+                    var entry = new RequestedEntryModel() {
+                        Name = requestedEntryModel
+                    };
+
+                    if (context.AllAttributes.TryGetAttribute("key", out var key)) {
+                        entry.Key = key.Value.ToString();
+                    }
+
+                    if (context.AllAttributes.TryGetAttribute("sink", out var sink)) {
+                        entry.Sink = sink.Value.ToString();
+                    }
+
+                    if (context.AllAttributes.TryGetAttribute("async", out var async)) {
+                        entry.Async = true;
+                    }
+
+                    if (context.AllAttributes.TryGetAttribute("defer", out var defer)) {
+                        entry.Defer = true;
+                    }
+
+                    _webpackViewData.AddEntry(entry);
                 }
             }
         }

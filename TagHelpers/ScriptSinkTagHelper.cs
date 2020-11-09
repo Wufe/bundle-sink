@@ -27,24 +27,46 @@ namespace BundleSink.TagHelpers
         public override void Process(TagHelperContext context, TagHelperOutput output)
         {
             output.TagName = null;
-            // TODO: null check / existence check
-            var files = new List<string>();
-            foreach (var requestEntry in _webpackViewData.RequestedEntries)
+            var sinkName = RequestedEntryModel.DEFAULT_SINK_NAME;
+
+            if (context.AllAttributes.TryGetAttribute("name", out var name)) {
+                sinkName = name.Value.ToString();
+            }
+
+            var finalOutput = "";
+
+            var serializedFilesWithinThisSink = new List<string>();
+            foreach (var requestEntry in _webpackViewData.RequestedEntries.Where(x => x.Sink == sinkName))
             {
-                var entryFiles = _webpackManifest.Value[requestEntry];
-                foreach (var file in entryFiles.JS)
-                {
-                    if (!files.Contains(file)) {
-                        files.Add(file);
+                if (_webpackManifest.Value.TryGetValue(requestEntry.Name, out var entryFiles)) {
+                    for (var i = 0; i < entryFiles.JS.Count; i++) {
+                        var file = entryFiles.JS[i];
+
+                        var fileIsADependency = i < entryFiles.JS.Count -1;
+
+                        var serializedFileSearchKey = file;
+
+                        if (!fileIsADependency && requestEntry.Key != null)
+                            serializedFileSearchKey += requestEntry.Key;
+
+                        if (!serializedFilesWithinThisSink.Contains(serializedFileSearchKey) &&
+                            _webpackViewData.TryMarkFileAsSerialized(serializedFileSearchKey))
+                        {
+                            var async = !fileIsADependency && requestEntry.Async ? "async" : "";
+                            var defer = !fileIsADependency && requestEntry.Defer ? "defer" : "";
+
+                            finalOutput += string.Format(
+                                "<script type=\"text/javascript\" src=\"{0}\"{1}{2}></script>\n",
+                                file,
+                                !string.IsNullOrEmpty(async) ? " " + async : "",
+                                !string.IsNullOrEmpty(defer) ? " " + defer : ""
+                            );
+                        }
                     }
                 }
             }
-            var scripts = files.Select(file => {
-                var scriptPath = Path.Combine("/", _settings.PublicOutputPath, file);
-                return $"<script type=\"text/javascript\" src=\"{scriptPath}\"></script>";
-            });
             
-            output.PostElement.AppendHtml(string.Join("\n", scripts));
+            output.PostElement.AppendHtml(finalOutput);
         }
     }
 }
