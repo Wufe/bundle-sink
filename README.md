@@ -82,3 +82,23 @@ The `<webpack-entry>` tag helper marked the specified entry as a dependency.
 The `<script-sink>` tag helper uses the dependencies declared all over the razor pages, taking care of duplicates and required chunks
 
 The html will contain the scripts required for the selected entries.
+
+***
+
+## Additional options
+
+The webpack-entry accepts more options in form of attributes
+- Use the attribute `key` if you need an entry to be imported more than once ... Why would you?  
+- Use the attribute `async` to mark the entry (but not its dependencies) as async
+- Use the attribute `defer` to mark the entry (but not its dependencies) as deferred
+
+**Named sinks**
+You can also render a webpack-entry to a specific script-sink:
+- Use the `name` attribute on the script-sink tag helper
+- Use the `sink` attribute on the webpack-entry tag helper
+
+*e.g.*
+```razor
+<webpack-entry sink="ABOVE" />
+<script-sink name="ABOVE />
+```
