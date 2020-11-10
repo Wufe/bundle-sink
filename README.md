@@ -88,7 +88,7 @@ The html will contain the scripts required for the selected entries.
 ## Additional options
 
 The webpack-entry accepts more options in form of attributes
-- Use the attribute `key` if you need an entry to be imported more than once ... Why would you?  
+- Use the attribute `key` if you need an entry to be imported more than once ... Why would you?  (Their dependencies will be imported once)
 - Use the attribute `async` to mark the entry (but not its dependencies) as async
 - Use the attribute `defer` to mark the entry (but not its dependencies) as deferred
 
