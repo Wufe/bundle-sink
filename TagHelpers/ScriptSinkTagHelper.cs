@@ -55,9 +55,11 @@ namespace BundleSink.TagHelpers
                             var async = !fileIsADependency && requestEntry.Async ? "async" : "";
                             var defer = !fileIsADependency && requestEntry.Defer ? "defer" : "";
 
+                            var filePath = Path.Combine("/", _settings.PublicOutputPath, file);
+
                             finalOutput += string.Format(
                                 "<script type=\"text/javascript\" src=\"{0}\"{1}{2}></script>\n",
-                                file,
+                                filePath,
                                 !string.IsNullOrEmpty(async) ? " " + async : "",
                                 !string.IsNullOrEmpty(defer) ? " " + defer : ""
                             );
