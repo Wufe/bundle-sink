@@ -5,7 +5,7 @@ param (
     $ApiKey
 )
 
-cd BundleSink
+cd $PSScriptRoot/../BundleSink
 
 rm -rf ./bin/Release
 
