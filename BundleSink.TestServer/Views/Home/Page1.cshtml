@@ -1,0 +1,12 @@
+<h2>Page 1</h2>
+
+<webpack-entry name="page-a" key=3 />
+<webpack-entry name="page-b" />
+
+@* <webpack-entry name="page-a" key="1" sink="ABOVE" defer />
+<webpack-entry name="page-b" key="2" sink="BELOW" async defer/> *@
+
+@section Scripts {
+    <script src="https://cdn.jsdelivr.net/npm/vue@2.6.12/dist/vue.js"></script>
+    <script-sink />
+}

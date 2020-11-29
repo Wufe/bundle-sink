@@ -81,7 +81,11 @@ This is a partial view from the homepage
 The `<webpack-entry>` tag helper marked the specified entry as a dependency.  
 The `<script-sink>` tag helper uses the dependencies declared all over the razor pages, taking care of duplicates and required chunks
 
-The html will contain the scripts required for the selected entries.
+The html will contain the scripts required for the selected entries, with their hash appended as query string.  
+*e.g.*
+```html
+<script type="text/javascript" src="/dist/my-homepage-feature.js?v=NMaMA8xzap806fSOec7CFpI78hl033lAOIq_Lrr4kmY"></script>
+```
 
 ***
 
@@ -102,3 +106,10 @@ You can also render a webpack-entry to a specific script-sink:
 <webpack-entry sink="ABOVE" />
 <script-sink name="ABOVE />
 ```
+
+***
+
+## TODO
+
+- Add `requires` and `required-by` attributes for `<webpack-entry />` tag.  
+Will help establish priority between entries.

@@ -1,9 +1,15 @@
+using System;
+using Microsoft.AspNetCore.Hosting;
+using Microsoft.Extensions.Hosting;
+
 namespace BundleSink.Configuration
 {
     public interface ISinkConfiguration : IWebpackSinkConfiguration {
 
     }
     public interface IWebpackSinkConfiguration {
+        bool AppendVersion { get; set; }
+        Func<IWebHostEnvironment, bool> PrintAdditionalAttributesCondition { get; set; }
         ISinkConfiguration WithWebpack(string manifestName, string publicOutputPath);
     }
 
@@ -12,6 +18,11 @@ namespace BundleSink.Configuration
         public bool UseWebpack { get; set; } = false;
         public string WebpackManifestName { get; set; } = "";
         public string WebpackPublicOutputPath { get; set; } = "";
+
+        public bool AppendVersion { get; set; } = true;
+
+        public Func<IWebHostEnvironment, bool> PrintAdditionalAttributesCondition { get; set; } =
+            environment => environment.IsDevelopment();
 
         public ISinkConfiguration WithWebpack(string manifestName, string publicOutputPath)
         {

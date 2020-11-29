@@ -44,6 +44,14 @@ namespace BundleSink.TagHelpers
                         entry.Defer = true;
                     }
 
+                    if (context.AllAttributes.TryGetAttribute("requires", out var requires)) {
+                        entry.Requires = requires.Value.ToString().Split(',');
+                    }
+
+                    if (context.AllAttributes.TryGetAttribute("required-by", out var requiredBy)) {
+                        entry.RequiredBy = requiredBy.Value.ToString().Split(',');
+                    }
+
                     _webpackViewData.AddEntry(entry);
                 }
             }

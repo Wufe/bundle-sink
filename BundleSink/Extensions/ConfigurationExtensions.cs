@@ -24,7 +24,9 @@ namespace BundleSink
                 {
                     var settings = new BundleSinkSettings()
                     {
-                        PublicOutputPath = configuration.WebpackPublicOutputPath
+                        PublicOutputPath = configuration.WebpackPublicOutputPath,
+                        AppendVersion = configuration.AppendVersion,
+                        PrintAllAttributes = configuration.PrintAdditionalAttributesCondition(builderContext.HostingEnvironment)
                     };
 
                     services.AddSingleton(settings);
