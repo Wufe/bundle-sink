@@ -5,6 +5,7 @@ param (
     $ApiKey
 )
 
+cd BundleSink
 
 rm -rf ./bin/Release
 
