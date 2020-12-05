@@ -139,16 +139,14 @@ That's how you use it:
 const BundleSinkWebpackPlugin = require('bundle-sink-webpack-plugin');
 module.exports = env => {
 
-    let entry = {
-        'page-a': './page-a/index.ts',
-        'page-b': './page-b/index.ts'
-    };
-
     const bundleSinkWebpackPlugin = new BundleSinkWebpackPlugin({
         clean: true,
         output: path.resolve(__dirname, 'wwwroot/dist/client-manifest.json'),
-        entry: entry,
-        env: env
+        entry: {
+            'page-a': './page-a/index.ts',
+            'page-b': './page-b/index.ts'
+        },
+        env
     });
 
     return {
