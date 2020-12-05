@@ -20,16 +20,26 @@ Manage multiple webpack entries within an ASPNET Core application.
 `@addTagHelper *, BundleSink`
 
 - From a command line:
-`npm install webpack-assets-manifest`
+`npm install bundle-sink-webpack-plugin`
 
 - Update your webpack.config.js adding the plugin:
 ```js
-    plugins: [
-        new WebpackAssetsManifest({
-            output: path.resolve(__dirname, 'client-manifest.json'),
-            entrypoints: true
-        })
-    ]
+const BundleSinkWebpackPlugin = require('bundle-sink-webpack-plugin');
+
+module.exports = env => {
+
+    const bundleSinkWebpackPlugin = new BundleSinkWebpackPlugin({
+        output: path.resolve(__dirname, 'client-manifest.json')
+    });
+
+    return {
+        ...,
+        plugins: [
+            ...bundleSinkWebpackPlugin.plugins
+        ]
+    };
+}
+    
 ```
 
 - Initialize BundleSink in Program.cs:
