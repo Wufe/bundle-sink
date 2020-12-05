@@ -108,7 +108,7 @@ The webpack-entry accepts more options in form of attributes
 - Use the attribute `css-only` to use css assets only
 - Use the attribute `js-only` to use js assets only
 
-**Named sinks**
+**Named sinks**  
 You can also render a webpack-entry to a specific script-sink:
 - Use the `name` attribute on the script-sink tag helper
 - Use the `sink` attribute on the webpack-entry tag helper
