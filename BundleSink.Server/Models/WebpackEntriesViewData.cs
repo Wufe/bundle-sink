@@ -37,6 +37,8 @@ namespace BundleSink.Models
         public string Sink { get; set; } = DEFAULT_SINK_NAME;
         public bool Async { get; set; } = false;
         public bool Defer { get; set; } = false;
+        public bool CSSOnly { get; set; } = false;
+        public bool JSOnly { get; set; } = false;
         public ICollection<string> Requires { get; set; } = new string[] { };
         public ICollection<string> RequiredBy { get; set; } = new string[] { };
     }

@@ -1,6 +1,7 @@
 const path = require('path');
-const BundleSinkWebpackPlugin = require('bundle-sink-webpack-plugin');
+const BundleSinkWebpackPlugin = require('../BundleSink.WebpackPlugin');
 const MiniCssExtractPlugin = require('mini-css-extract-plugin');
+const FixStyleOnlyEntriesPlugin = require('webpack-fix-style-only-entries');
 
 const mode = process.env.NODE_ENV === 'production' ?
     'production' : 'development';
@@ -18,8 +19,7 @@ module.exports = env => {
         clean: true,
         output: path.resolve(__dirname, 'wwwroot/dist/client-manifest.json'),
         entry,
-        env,
-        merge: false
+        env
     });
     
     return {
@@ -55,12 +55,13 @@ module.exports = env => {
             ]
         },
         resolve: {
-            extensions: ['.js', '.jsx', '.ts', '.tsx']
+            extensions: ['.js', '.jsx', '.ts', '.tsx', '.css', '.scss']
         },
         output: {
             path: path.resolve(__dirname, 'wwwroot/dist'),
             libraryTarget: 'umd',
-            filename: '[name].[contenthash].js',
+            filename: '[name].js',
+            chunkFilename: '[name].[contenthash].js',
         },
         optimization: {
             splitChunks: {
@@ -72,6 +73,7 @@ module.exports = env => {
         },
         plugins: [
             ...bundleSinkWebpackPlugin.plugins,
+            new FixStyleOnlyEntriesPlugin(),
             new MiniCssExtractPlugin({
                 // Options similar to the same options in webpackOptions.output
                 // both options are optional

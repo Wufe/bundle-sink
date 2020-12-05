@@ -44,6 +44,14 @@ namespace BundleSink.TagHelpers
                         entry.Defer = true;
                     }
 
+                    if (context.AllAttributes.TryGetAttribute("css-only", out var cssOnly)) {
+                        entry.CSSOnly = true;
+                    }
+
+                    if (context.AllAttributes.TryGetAttribute("js-only", out var jsOnly)) {
+                        entry.JSOnly = true;
+                    }
+
                     if (context.AllAttributes.TryGetAttribute("requires", out var requires)) {
                         entry.Requires = requires.Value.ToString().Split(',');
                     }

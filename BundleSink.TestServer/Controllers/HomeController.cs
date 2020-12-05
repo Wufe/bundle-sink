@@ -32,5 +32,10 @@ namespace BundleSink.TestServer.Controllers
         {
             return View();
         }
+
+        public IActionResult Page3()
+        {
+            return View();
+        }
     }
 }

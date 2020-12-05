@@ -1,7 +1,7 @@
 const path = require('path');
 const BundleSinkWebpackPlugin = require('../BundleSink.WebpackPlugin/index');
 
-module.exports = env => {
+module.exports = (env = {}) => {
 
     let entry = {
         'page-a': './page-a/index.ts',

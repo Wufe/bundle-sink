@@ -52,38 +52,72 @@ namespace BundleSink.TagHelpers
             foreach (var requestEntry in _webpackViewData.RequestedEntries.Where(x => x.Sink == sinkName))
             {
                 if (_webpackManifest.Value.TryGetValue(requestEntry.Name, out var entryFiles)) {
-                    for (var i = 0; i < entryFiles.JS.Count; i++) {
-                        var file = entryFiles.JS[i];
-
-                        var fileIsADependency = i < entryFiles.JS.Count -1;
-
-                        var serializedFileSearchKey = file;
-
-                        if (!fileIsADependency && requestEntry.Key != null)
-                            serializedFileSearchKey += requestEntry.Key;
-
-                        if (!serializedFilesWithinThisSink.Contains(serializedFileSearchKey) &&
-                            _webpackViewData.TryMarkFileAsSerialized(serializedFileSearchKey))
+                    if (!requestEntry.CSSOnly) {
+                        for (var i = 0; i < entryFiles.Assets.JS.Count; i++)
                         {
-                            var async = !fileIsADependency && requestEntry.Async ? "async" : "";
-                            var defer = !fileIsADependency && requestEntry.Defer ? "defer" : "";
+                            var file = entryFiles.Assets.JS[i];
 
-                            var filePath = Path.Combine("/", _settings.PublicOutputPath, file);
+                            var fileIsADependency = i < entryFiles.Assets.JS.Count - 1;
 
-                            if (_settings.AppendVersion)
-                                filePath = _fileVersionProvider.AddFileVersionToPath(ViewContext.HttpContext.Request.PathBase, filePath);
+                            var serializedFileSearchKey = file;
 
-                            var shouldPrintKeyAttribute = _settings.PrintAllAttributes && !string.IsNullOrEmpty(requestEntry.Key);
-                            var shouldPrintSinkAttribute = _settings.PrintAllAttributes && !string.IsNullOrEmpty(requestEntry.Sink);
+                            if (!fileIsADependency && requestEntry.Key != null)
+                                serializedFileSearchKey += requestEntry.Key;
 
-                            finalOutput += string.Format(
-                                "<script type=\"text/javascript\" src=\"{0}\"{1}{2}{3}{4}></script>\n",
-                                filePath,
-                                !string.IsNullOrEmpty(async) ? " " + async : "",
-                                !string.IsNullOrEmpty(defer) ? " " + defer : "",
-                                shouldPrintKeyAttribute ? $" key=\"{requestEntry.Key}\"" : "",
-                                shouldPrintSinkAttribute ? $" sink=\"{requestEntry.Sink}\"" : ""
-                            );
+                            if (!serializedFilesWithinThisSink.Contains(serializedFileSearchKey) &&
+                                _webpackViewData.TryMarkFileAsSerialized(serializedFileSearchKey))
+                            {
+                                var async = !fileIsADependency && requestEntry.Async ? "async" : "";
+                                var defer = !fileIsADependency && requestEntry.Defer ? "defer" : "";
+
+                                var filePath = Path.Combine("/", _settings.PublicOutputPath, file);
+
+                                if (_settings.AppendVersion)
+                                    filePath = _fileVersionProvider.AddFileVersionToPath(ViewContext.HttpContext.Request.PathBase, filePath);
+
+                                var shouldPrintKeyAttribute = _settings.PrintAllAttributes && !string.IsNullOrEmpty(requestEntry.Key);
+                                var shouldPrintSinkAttribute = _settings.PrintAllAttributes && !string.IsNullOrEmpty(requestEntry.Sink);
+
+                                finalOutput += string.Format(
+                                    "<script type=\"text/javascript\" src=\"{0}\"{1}{2}{3}{4}></script>\n",
+                                    filePath,
+                                    !string.IsNullOrEmpty(async) ? " " + async : "",
+                                    !string.IsNullOrEmpty(defer) ? " " + defer : "",
+                                    shouldPrintKeyAttribute ? $" key=\"{requestEntry.Key}\"" : "",
+                                    shouldPrintSinkAttribute ? $" sink=\"{requestEntry.Sink}\"" : ""
+                                );
+                            }
+                        }
+                    }
+                    
+                    if (!requestEntry.JSOnly) {
+                        for (var i = 0; i < entryFiles.Assets.CSS.Count; i++)
+                        {
+                            var file = entryFiles.Assets.CSS[i];
+
+                            var serializedFileSearchKey = file;
+
+                            if (requestEntry.Key != null)
+                                serializedFileSearchKey += requestEntry.Key;
+
+                            if (!serializedFilesWithinThisSink.Contains(serializedFileSearchKey) &&
+                                _webpackViewData.TryMarkFileAsSerialized(serializedFileSearchKey))
+                            {
+                                var filePath = Path.Combine("/", _settings.PublicOutputPath, file);
+
+                                if (_settings.AppendVersion)
+                                    filePath = _fileVersionProvider.AddFileVersionToPath(ViewContext.HttpContext.Request.PathBase, filePath);
+
+                                var shouldPrintKeyAttribute = _settings.PrintAllAttributes && !string.IsNullOrEmpty(requestEntry.Key);
+                                var shouldPrintSinkAttribute = _settings.PrintAllAttributes && !string.IsNullOrEmpty(requestEntry.Sink);
+
+                                finalOutput += string.Format(
+                                    "<script type=\"text/javascript\" src=\"{0}\"{1}{2}></script>\n",
+                                    filePath,
+                                    shouldPrintKeyAttribute ? $" key=\"{requestEntry.Key}\"" : "",
+                                    shouldPrintSinkAttribute ? $" sink=\"{requestEntry.Sink}\"" : ""
+                                );
+                            }
                         }
                     }
                 }

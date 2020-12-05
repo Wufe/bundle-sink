@@ -69,9 +69,9 @@
     source-map "^0.6.1"
 
 "@types/webpack-sources@*":
-  version "2.0.0"
-  resolved "https://registry.yarnpkg.com/@types/webpack-sources/-/webpack-sources-2.0.0.tgz#08216ab9be2be2e1499beaebc4d469cec81e82a7"
-  integrity sha512-a5kPx98CNFRKQ+wqawroFunvFqv7GHm/3KOI52NY9xWADgc8smu4R6prt4EU/M4QfVjvgBkMqU4fBhw3QfMVkg==
+  version "2.1.0"
+  resolved "https://registry.yarnpkg.com/@types/webpack-sources/-/webpack-sources-2.1.0.tgz#8882b0bd62d1e0ce62f183d0d01b72e6e82e8c10"
+  integrity sha512-LXn/oYIpBeucgP1EIJbKQ2/4ZmpvRl+dlrFdX7+94SKRUV3Evy3FsfMZY318vGhkWUS5MPhtOM3w1/hCOAOXcg==
   dependencies:
     "@types/node" "*"
     "@types/source-list-map" "*"
@@ -439,10 +439,10 @@ buffer-from@^1.0.0:
   resolved "https://registry.yarnpkg.com/buffer-from/-/buffer-from-1.1.1.tgz#32713bc028f75c02fdb710d7c7bcec1f2c6070ef"
   integrity sha512-MQcXEUbCKtEo7bhqEs6560Hyd4XaovZlO/k9V3hjVUF/zwW7KBVdSK4gIt/bzwS9MbR5qob+F5jusZsb0YQK2A==
 
-bundle-sink-webpack-plugin@^1.0.1:
-  version "1.0.1"
-  resolved "https://registry.yarnpkg.com/bundle-sink-webpack-plugin/-/bundle-sink-webpack-plugin-1.0.1.tgz#3d39a31aada7ef7148afd32e0558dff13009ef16"
-  integrity sha512-8zJcVW+OpzO62EBmb3VSyAAVKxwfwUXpg2ueOwIlAm5ObmWM90irqbAys/2y9yhUqmRTBz9dQ0wT5DT11AplEw==
+bundle-sink-webpack-plugin@^1.0.2:
+  version "1.0.2"
+  resolved "https://registry.yarnpkg.com/bundle-sink-webpack-plugin/-/bundle-sink-webpack-plugin-1.0.2.tgz#5d518f6c9eaf6f6a13959acd31889a28e657a72a"
+  integrity sha512-SNvLsTbus6GF1WzUQst2Cb0yhdUYSQGKxxBo2ObbxwZMmqQaT4R0Zu552oLGEyEziHVbNuFf1c8eGjTtvVIbkA==
 
 cache-base@^1.0.1:
   version "1.0.1"
@@ -2312,6 +2312,11 @@ webpack-cli@^4.2.0:
     rechoir "^0.7.0"
     v8-compile-cache "^2.2.0"
     webpack-merge "^4.2.2"
+
+webpack-fix-style-only-entries@^0.6.0:
+  version "0.6.0"
+  resolved "https://registry.yarnpkg.com/webpack-fix-style-only-entries/-/webpack-fix-style-only-entries-0.6.0.tgz#193ab04c63cba5c1da92d5ec34a48aa1448a853c"
+  integrity sha512-9d3S+Y3b90D5OFUxO6bA/o7Ebx0uGWSPoVepvMvMEup7XefqdrDPEDI10tuFhxERD/xkMJAViakE1NPZn9zA+w==
 
 webpack-log@^1.2.0:
   version "1.2.0"
