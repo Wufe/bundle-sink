@@ -119,6 +119,12 @@ You can also render a webpack-entry to a specific script-sink:
 <script-sink name="ABOVE />
 ```
 
+**Dependencies**  
+You can mark a `<webpack-entry>` with the `requires` attribute containing a comma separated list of entries required.  
+These dependencies will be printed before the dependant entry.  
+
+At the same time you can mark an entry with the `required-by` attribute, which tells the library to prevent printing the entry if no dependants are declared.  
+
 ***
 
 ## Partial builds
@@ -206,7 +212,5 @@ module.exports = env => {
 
 ## TODO
 
-- Add `requires` and `required-by` attributes for `<webpack-entry />` tag.  
-Will help establish priority between entries.  
 - Tag helper for generic JS files
 - Tag helper for JS excerpts ( literal JS `<script>` tags )

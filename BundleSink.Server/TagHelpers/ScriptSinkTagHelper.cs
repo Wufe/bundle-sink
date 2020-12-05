@@ -22,6 +22,8 @@ namespace BundleSink.TagHelpers
         [ViewContext]
         public ViewContext ViewContext { get; set; }
 
+        private string _sinkName;
+
         public ScriptSinkTagHelper(
             BundleSinkSettings settings,
             IOptionsSnapshot<WebpackEntriesManifest> webpackManifest,
@@ -40,90 +42,154 @@ namespace BundleSink.TagHelpers
         public override void Process(TagHelperContext context, TagHelperOutput output)
         {
             output.TagName = null;
-            var sinkName = RequestedEntryModel.DEFAULT_SINK_NAME;
+            _sinkName = RequestedEntryModel.DEFAULT_SINK_NAME;
 
             if (context.AllAttributes.TryGetAttribute("name", out var name)) {
-                sinkName = name.Value.ToString();
+                _sinkName = name.Value.ToString();
             }
 
             var finalOutput = "";
-
-            var serializedFilesWithinThisSink = new List<string>();
-            foreach (var requestEntry in _webpackViewData.RequestedEntries.Where(x => x.Sink == sinkName))
+            foreach (var requestEntry in _webpackViewData.RequestedEntries.Where(x => x.Sink == _sinkName))
             {
-                if (_webpackManifest.Value.TryGetValue(requestEntry.Name, out var entryFiles)) {
-                    if (!requestEntry.CSSOnly) {
-                        for (var i = 0; i < entryFiles.Assets.JS.Count; i++)
-                        {
-                            var file = entryFiles.Assets.JS[i];
-
-                            var fileIsADependency = i < entryFiles.Assets.JS.Count - 1;
-
-                            var serializedFileSearchKey = file;
-
-                            if (!fileIsADependency && requestEntry.Key != null)
-                                serializedFileSearchKey += requestEntry.Key;
-
-                            if (!serializedFilesWithinThisSink.Contains(serializedFileSearchKey) &&
-                                _webpackViewData.TryMarkFileAsSerialized(serializedFileSearchKey))
-                            {
-                                var async = !fileIsADependency && requestEntry.Async ? "async" : "";
-                                var defer = !fileIsADependency && requestEntry.Defer ? "defer" : "";
-
-                                var filePath = Path.Combine("/", _settings.PublicOutputPath, file);
-
-                                if (_settings.AppendVersion)
-                                    filePath = _fileVersionProvider.AddFileVersionToPath(ViewContext.HttpContext.Request.PathBase, filePath);
-
-                                var shouldPrintKeyAttribute = _settings.PrintAllAttributes && !string.IsNullOrEmpty(requestEntry.Key);
-                                var shouldPrintSinkAttribute = _settings.PrintAllAttributes && !string.IsNullOrEmpty(requestEntry.Sink);
-
-                                finalOutput += string.Format(
-                                    "<script type=\"text/javascript\" src=\"{0}\"{1}{2}{3}{4}></script>\n",
-                                    filePath,
-                                    !string.IsNullOrEmpty(async) ? " " + async : "",
-                                    !string.IsNullOrEmpty(defer) ? " " + defer : "",
-                                    shouldPrintKeyAttribute ? $" key=\"{requestEntry.Key}\"" : "",
-                                    shouldPrintSinkAttribute ? $" sink=\"{requestEntry.Sink}\"" : ""
-                                );
-                            }
-                        }
-                    }
-                    
-                    if (!requestEntry.JSOnly) {
-                        for (var i = 0; i < entryFiles.Assets.CSS.Count; i++)
-                        {
-                            var file = entryFiles.Assets.CSS[i];
-
-                            var serializedFileSearchKey = file;
-
-                            if (requestEntry.Key != null)
-                                serializedFileSearchKey += requestEntry.Key;
-
-                            if (!serializedFilesWithinThisSink.Contains(serializedFileSearchKey) &&
-                                _webpackViewData.TryMarkFileAsSerialized(serializedFileSearchKey))
-                            {
-                                var filePath = Path.Combine("/", _settings.PublicOutputPath, file);
-
-                                if (_settings.AppendVersion)
-                                    filePath = _fileVersionProvider.AddFileVersionToPath(ViewContext.HttpContext.Request.PathBase, filePath);
-
-                                var shouldPrintKeyAttribute = _settings.PrintAllAttributes && !string.IsNullOrEmpty(requestEntry.Key);
-                                var shouldPrintSinkAttribute = _settings.PrintAllAttributes && !string.IsNullOrEmpty(requestEntry.Sink);
-
-                                finalOutput += string.Format(
-                                    "<script type=\"text/javascript\" src=\"{0}\"{1}{2}></script>\n",
-                                    filePath,
-                                    shouldPrintKeyAttribute ? $" key=\"{requestEntry.Key}\"" : "",
-                                    shouldPrintSinkAttribute ? $" sink=\"{requestEntry.Sink}\"" : ""
-                                );
-                            }
-                        }
-                    }
-                }
+                finalOutput += GetEntryOutput(requestEntry);
             }
             
             output.PostElement.AppendHtml(finalOutput);
+        }
+
+        private string GetEntryOutput(RequestedEntryModel requestedEntry) {
+            var finalOutput = "";
+
+            if (_webpackViewData.TryMarkEntryAsSerialized(requestedEntry)) {
+
+                // Prevent importing if no script requires this one
+                if (requestedEntry.RequiredBy.Any()) {
+                    var dependants = requestedEntry.RequiredBy
+                        .Where(dependant => _webpackViewData.TryGetRequestedEntry(dependant, out var _));
+                    if (!dependants.Any()) {
+                        if (_webHostEnvironment.IsDevelopment()) {
+                            finalOutput += $"<!-- Preventing output of {requestedEntry.GetIdentifier()} because there are no dependants. -->\n";
+                        }
+                        return finalOutput;
+                    }
+                        
+                }
+                
+
+                // Resolve requirements
+                foreach (var requirement in requestedEntry.Requires)
+                {
+                    RequestedEntryModel requirementEntry;
+                    if (!_webpackViewData.TryGetRequestedEntry(requirement, out requirementEntry))
+                    {
+                        requirementEntry = new RequestedEntryModel()
+                        {
+                            Name = requirement,
+                            Sink = _sinkName
+                        };
+                    }
+                    finalOutput += GetEntryOutput(requirementEntry);
+                }
+
+                if (_webpackManifest.Value.TryGetValue(requestedEntry.Name, out var entryFiles))
+                {
+                    finalOutput += SerializeEntryJS(requestedEntry, entryFiles);
+                    finalOutput += SerializeEntryCSS(requestedEntry, entryFiles);
+                }
+            }
+
+            
+            return finalOutput;
+        }
+
+        private string SerializeEntryJS(RequestedEntryModel requestedEntry, WebpackEntryModel webpackEntry) {
+            var finalOutput = "";
+            if (!requestedEntry.CSSOnly)
+            {
+                for (var i = 0; i < webpackEntry.Assets.JS.Count; i++)
+                {
+                    var file = webpackEntry.Assets.JS[i];
+
+                    var fileIsADependency = i < webpackEntry.Assets.JS.Count - 1;
+
+                    var serializedFileSearchKey = file;
+
+                    if (!fileIsADependency && requestedEntry.Key != null)
+                        serializedFileSearchKey += requestedEntry.Key;
+
+                    if (_webpackViewData.TryMarkFileAsSerialized(serializedFileSearchKey))
+                    {
+                        var async = !fileIsADependency && requestedEntry.Async ? "async" : "";
+                        var defer = !fileIsADependency && requestedEntry.Defer ? "defer" : "";
+
+                        var filePath = Path.Combine("/", _settings.PublicOutputPath, file);
+
+                        if (_settings.AppendVersion)
+                            filePath = _fileVersionProvider.AddFileVersionToPath(ViewContext.HttpContext.Request.PathBase, filePath);
+
+                        finalOutput += string.Format(
+                            "<script type=\"text/javascript\" src=\"{0}\"{1}{2}{3}></script>\n",
+                            filePath,
+                            !string.IsNullOrEmpty(async) ? " " + async : "",
+                            !string.IsNullOrEmpty(defer) ? " " + defer : "",
+                            _settings.PrintAllAttributes ? SerializeEntryAttributes(requestedEntry) : ""
+                        );
+                    }
+                }
+            }
+            return finalOutput;
+        }
+
+        private string SerializeEntryCSS(RequestedEntryModel requestedEntry, WebpackEntryModel webpackEntry)
+        {
+            var finalOutput = "";
+            if (!requestedEntry.JSOnly)
+            {
+                for (var i = 0; i < webpackEntry.Assets.CSS.Count; i++)
+                {
+                    var file = webpackEntry.Assets.CSS[i];
+
+                    var serializedFileSearchKey = file;
+
+                    if (requestedEntry.Key != null)
+                        serializedFileSearchKey += requestedEntry.Key;
+
+                    if (_webpackViewData.TryMarkFileAsSerialized(serializedFileSearchKey))
+                    {
+                        var filePath = Path.Combine("/", _settings.PublicOutputPath, file);
+
+                        if (_settings.AppendVersion)
+                            filePath = _fileVersionProvider.AddFileVersionToPath(ViewContext.HttpContext.Request.PathBase, filePath);
+
+                        finalOutput += string.Format(
+                            "<link rel=\"stylesheet\" href=\"{0}\"{1}></script>\n",
+                            filePath,
+                            _settings.PrintAllAttributes ? SerializeEntryAttributes(requestedEntry) : ""
+                        );
+                    }
+                }
+            }
+            return finalOutput;
+        }
+
+        private string SerializeEntryAttributes(RequestedEntryModel requestedEntry) {
+            var shouldPrintKeyAttribute = !string.IsNullOrEmpty(requestedEntry.Key);
+            var shouldPrintSinkAttribute = !string.IsNullOrEmpty(requestedEntry.Sink);
+            var shouldPrintRequiresAttribute = requestedEntry.Requires.Any();
+            var shouldPrintRequiredByAttribute = requestedEntry.RequiredBy.Any();
+            var shouldPrintCSSOnlyAttribute = requestedEntry.CSSOnly;
+            var shouldPrintJSOnlyAttribute = requestedEntry.JSOnly;
+
+            return string.Format(
+                "{0}{1}{2}",
+                $" entry=\"{requestedEntry.Name}\"",
+                shouldPrintKeyAttribute ? $" key=\"{requestedEntry.Key}\"" : "",
+                shouldPrintSinkAttribute ? $" sink=\"{requestedEntry.Sink}\"" : "",
+                shouldPrintRequiresAttribute ? $" requires=\"{String.Join(',', requestedEntry.Requires)}\"" : "",
+                shouldPrintRequiredByAttribute ? $" required-by=\"{String.Join(',', requestedEntry.RequiredBy)}\"" : "",
+                shouldPrintCSSOnlyAttribute ? $" css-only" : "",
+                shouldPrintJSOnlyAttribute ? $" js-only" : ""
+            );
         }
     }
 }

@@ -1,8 +1,7 @@
 <h2>Page 1</h2>
 
-<webpack-entry name="page-a" />
-<webpack-entry name="page-a-style" />
-@* <webpack-entry name="page-b" /> *@
+<webpack-entry name="page-a" requires="page-a-style" />
+<webpack-entry name="page-a-style" required-by="page-a" />
 
 @* <webpack-entry name="page-a" key="1" sink="ABOVE" defer />
 <webpack-entry name="page-b" key="2" sink="BELOW" async defer/> *@
