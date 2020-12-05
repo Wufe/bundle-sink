@@ -1,5 +1,5 @@
 const path = require('path');
-const BundleSinkWebpackPlugin = require('../BundleSink.WebpackPlugin/index');
+const BundleSinkWebpackPlugin = require('bundle-sink-webpack-plugin');
 
 module.exports = env => {
 
