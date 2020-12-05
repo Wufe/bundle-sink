@@ -6,19 +6,29 @@ module.exports = env => {
     let entry = {
         'page-a': './page-a/index.ts',
         'page-b': './page-b/index.ts'
-    };
+    }
 
-    const bundleSinkWebpackPlugin = new BundleSinkWebpackPlugin({
+    const bundleSinkOptions = {
         clean: true,
         output: path.resolve(__dirname, 'wwwroot/dist/client-manifest.json'),
-        entry,
-        env
-    });
+        partial: false
+    };
+    
+    if (env.only) {
+        const selectedEntry = env.only;
+        if (!entry[selectedEntry]) {
+            throw new Error(`Syntax: --env only=<entry name>`);
+        }
+        entry = { [selectedEntry]: entry[selectedEntry] };
+        bundleSinkOptions.partial = true;
+    }
+
+    const bundleSinkWebpackPlugin = new BundleSinkWebpackPlugin(bundleSinkOptions);
     
     return {
         mode: 'development',
         context: path.resolve(__dirname, 'Client'),
-        entry: bundleSinkWebpackPlugin.entry,
+        entry,
         devtool: 'source-map',
         module: {
             rules: [
@@ -37,6 +47,7 @@ module.exports = env => {
         },
         output: {
             path: path.resolve(__dirname, 'wwwroot/dist'),
+            publicPath: '/ist',
             libraryTarget: 'umd',
             filename: '[name].[contenthash].js',
         },
