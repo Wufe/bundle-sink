@@ -105,6 +105,8 @@ The webpack-entry accepts more options in form of attributes
 - Use the attribute `key` if you need an entry to be imported more than once ... Why would you?  (Their dependencies will be imported once)
 - Use the attribute `async` to mark the entry (but not its dependencies) as async
 - Use the attribute `defer` to mark the entry (but not its dependencies) as deferred
+- Use the attribute `css-only` to use css assets only
+- Use the attribute `js-only` to use js assets only
 
 **Named sinks**
 You can also render a webpack-entry to a specific script-sink:
