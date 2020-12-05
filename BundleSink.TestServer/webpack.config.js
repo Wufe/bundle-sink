@@ -1,23 +1,30 @@
 const path = require('path');
 const BundleSinkWebpackPlugin = require('bundle-sink-webpack-plugin');
+const MiniCssExtractPlugin = require('mini-css-extract-plugin');
+
+const mode = process.env.NODE_ENV === 'production' ?
+    'production' : 'development';
 
 module.exports = env => {
 
     let entry = {
-        'page-a': './page-a/index.ts',
-        'page-b': './page-b/index.ts'
+        'page-a': './Client/page-a/index.ts',
+        'page-b': './Client/page-b/index.ts',
+        'page-c': './Client/page-c/index.ts',
+        'page-a-style': './Styles/page-a-style.scss',
     };
 
     const bundleSinkWebpackPlugin = new BundleSinkWebpackPlugin({
         clean: true,
         output: path.resolve(__dirname, 'wwwroot/dist/client-manifest.json'),
         entry,
-        env
+        env,
+        merge: false
     });
     
     return {
-        mode: 'development',
-        context: path.resolve(__dirname, 'Client'),
+        mode,
+        context: path.resolve(__dirname),
         entry: bundleSinkWebpackPlugin.entry,
         devtool: 'source-map',
         module: {
@@ -29,6 +36,21 @@ module.exports = env => {
                         transpileOnly: true
                     },
                     exclude: /node_modules/,
+                },
+                {
+                    test: /\.s[ac]ss$/i,
+                    use: [
+                        MiniCssExtractPlugin.loader,
+
+                        // Creates `style` nodes from JS strings
+                        // "style-loader",
+
+                        // Translates CSS into CommonJS
+                        "css-loader",
+
+                        // Compiles Sass to CSS
+                        "sass-loader",
+                    ],
                 }
             ]
         },
@@ -49,7 +71,13 @@ module.exports = env => {
             vue: 'Vue'
         },
         plugins: [
-            ...bundleSinkWebpackPlugin.plugins
+            ...bundleSinkWebpackPlugin.plugins,
+            new MiniCssExtractPlugin({
+                // Options similar to the same options in webpackOptions.output
+                // both options are optional
+                filename: "[name].css",
+                chunkFilename: "[id].css",
+            }),
         ]
     }
 }

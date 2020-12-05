@@ -33,7 +33,7 @@ module.exports = function BundleSink(options = {}) {
 
     const webpackAssetsManifest = new WebpackAssetsManifest({
         output,
-        merge: true,
+        merge: partial,
         entrypoints: true,
         ...assetsManifestOptions
     });
