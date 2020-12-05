@@ -211,4 +211,3 @@ Will help establish priority between entries.
 - Tag helper for generic JS files
 - Tag helper for JS excerpts ( literal JS `<script>` tags )
 - Add support for CSS
-- Add support for partial compilations
