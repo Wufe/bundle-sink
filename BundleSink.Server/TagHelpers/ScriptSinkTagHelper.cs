@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using BundleSink.Models;
+using BundleSink.Models.Entry;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.AspNetCore.Mvc.ViewFeatures;
@@ -57,7 +58,7 @@ namespace BundleSink.TagHelpers
             output.PostElement.AppendHtml(finalOutput);
         }
 
-        private string GetEntryOutput(RequestedEntryModel requestedEntry) {
+        private string GetEntryOutput(IRequestedEntryModel requestedEntry) {
             var finalOutput = "";
 
             if (_webpackViewData.TryMarkEntryAsSerialized(requestedEntry)) {
@@ -71,22 +72,18 @@ namespace BundleSink.TagHelpers
                             finalOutput += $"<!-- Preventing output of {requestedEntry.GetIdentifier()} because there are no dependants. -->\n";
                         }
                         return finalOutput;
-                    }
-                        
+                    }   
                 }
                 
-
                 // Resolve requirements
                 foreach (var requirement in requestedEntry.Requires)
                 {
-                    RequestedEntryModel requirementEntry;
+                    IRequestedEntryModel requirementEntry;
                     if (!_webpackViewData.TryGetRequestedEntry(requirement, out requirementEntry))
                     {
-                        requirementEntry = new RequestedEntryModel()
-                        {
-                            Name = requirement,
-                            Sink = _sinkName
-                        };
+                        var requirementEntryModel = RequestedEntryModel.BuildWebpackEntry(requirement);
+                        requirementEntryModel.Sink = _sinkName;
+                        requirementEntry = requirementEntryModel;
                     }
                     finalOutput += GetEntryOutput(requirementEntry);
                 }
@@ -102,7 +99,7 @@ namespace BundleSink.TagHelpers
             return finalOutput;
         }
 
-        private string SerializeEntryJS(RequestedEntryModel requestedEntry, WebpackEntryModel webpackEntry) {
+        private string SerializeEntryJS(IRequestedEntryModel requestedEntry, WebpackEntryModel webpackEntry) {
             var finalOutput = "";
             if (!requestedEntry.CSSOnly)
             {
@@ -140,7 +137,7 @@ namespace BundleSink.TagHelpers
             return finalOutput;
         }
 
-        private string SerializeEntryCSS(RequestedEntryModel requestedEntry, WebpackEntryModel webpackEntry)
+        private string SerializeEntryCSS(IRequestedEntryModel requestedEntry, WebpackEntryModel webpackEntry)
         {
             var finalOutput = "";
             if (!requestedEntry.JSOnly)
@@ -172,7 +169,7 @@ namespace BundleSink.TagHelpers
             return finalOutput;
         }
 
-        private string SerializeEntryAttributes(RequestedEntryModel requestedEntry) {
+        private string SerializeEntryAttributes(IRequestedEntryModel requestedEntry) {
             var shouldPrintKeyAttribute = !string.IsNullOrEmpty(requestedEntry.Key);
             var shouldPrintSinkAttribute = !string.IsNullOrEmpty(requestedEntry.Sink);
             var shouldPrintRequiresAttribute = requestedEntry.Requires.Any();

@@ -1,4 +1,5 @@
 using BundleSink.Models;
+using BundleSink.Models.Entry;
 using Microsoft.AspNetCore.Razor.TagHelpers;
 using Microsoft.Extensions.Options;
 
@@ -21,12 +22,10 @@ namespace BundleSink.TagHelpers
         {
             output.TagName = null;
             if (context.AllAttributes.TryGetAttribute("name", out var name)) {
-                var requestedEntryModel = name.Value.ToString();
-                if (_webpackManifest.Value.ContainsKey(requestedEntryModel)) {
+                var entryName = name.Value.ToString();
+                if (_webpackManifest.Value.ContainsKey(entryName)) {
 
-                    var entry = new RequestedEntryModel() {
-                        Name = requestedEntryModel
-                    };
+                    var entry = RequestedEntryModel.BuildWebpackEntry(entryName);
 
                     if (context.AllAttributes.TryGetAttribute("key", out var key)) {
                         entry.Key = key.Value.ToString();

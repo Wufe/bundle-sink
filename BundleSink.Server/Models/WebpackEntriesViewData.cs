@@ -1,5 +1,6 @@
 using System.Collections.Generic;
 using System.Linq;
+using BundleSink.Models.Entry;
 
 namespace BundleSink.Models
 {
@@ -7,9 +8,9 @@ namespace BundleSink.Models
         public IDictionary<string, bool> SerializedFiles { get; private set; } = new Dictionary<string, bool>();
 
         // A Collection to iterate over
-        public ICollection<RequestedEntryModel> RequestedEntries { get; private set; } = new List<RequestedEntryModel>();
+        public ICollection<IRequestedEntryModel> RequestedEntries { get; private set; } = new List<IRequestedEntryModel>();
         // A Dictionary for fast checking
-        public IDictionary<string, RequestedEntryModel> RequestedEntriesDictionary { get; set; } = new Dictionary<string, RequestedEntryModel>();
+        public IDictionary<string, IRequestedEntryModel> RequestedEntriesDictionary { get; private set; } = new Dictionary<string, IRequestedEntryModel>();
         public void AddEntry(RequestedEntryModel entry) {
             var identifier = entry.GetIdentifier();
             if (!RequestedEntriesDictionary.ContainsKey(identifier)) {
@@ -18,7 +19,7 @@ namespace BundleSink.Models
             }
         }
 
-        public bool TryGetRequestedEntry(string name, out RequestedEntryModel requestedEntry) {
+        public bool TryGetRequestedEntry(string name, out IRequestedEntryModel requestedEntry) {
             return RequestedEntriesDictionary.TryGetValue(name, out requestedEntry);
         }
 
@@ -30,9 +31,9 @@ namespace BundleSink.Models
             return false;
         }
 
-        public IDictionary<string, RequestedEntryModel> SerializedEntries { get; private set; } =
-            new Dictionary<string, RequestedEntryModel>();
-        public bool TryMarkEntryAsSerialized(RequestedEntryModel requestedEntry) {
+        public IDictionary<string, IRequestedEntryModel> SerializedEntries { get; private set; } =
+            new Dictionary<string, IRequestedEntryModel>();
+        public bool TryMarkEntryAsSerialized(IRequestedEntryModel requestedEntry) {
             var identifier = requestedEntry.GetIdentifier();
             if (!SerializedEntries.ContainsKey(identifier)) {
                 SerializedEntries.Add(identifier, requestedEntry);
@@ -41,22 +42,5 @@ namespace BundleSink.Models
             return false;
         }
 
-    }
-
-    public class RequestedEntryModel {
-
-        public static string DEFAULT_SINK_NAME = "Default";
-
-        public string GetIdentifier() => $"{Name}{Key}";
-
-        public string Name { get; set; }
-        public string Key { get; set; } = "";
-        public string Sink { get; set; } = DEFAULT_SINK_NAME;
-        public bool Async { get; set; } = false;
-        public bool Defer { get; set; } = false;
-        public bool CSSOnly { get; set; } = false;
-        public bool JSOnly { get; set; } = false;
-        public ICollection<string> Requires { get; set; } = new string[] { };
-        public ICollection<string> RequiredBy { get; set; } = new string[] { };
     }
 }
