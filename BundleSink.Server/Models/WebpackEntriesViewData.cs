@@ -10,17 +10,23 @@ namespace BundleSink.Models
         // A Collection to iterate over
         public ICollection<IRequestedEntryModel> RequestedEntries { get; private set; } = new List<IRequestedEntryModel>();
         // A Dictionary for fast checking
-        public IDictionary<string, IRequestedEntryModel> RequestedEntriesDictionary { get; private set; } = new Dictionary<string, IRequestedEntryModel>();
+        public IDictionary<string, IRequestedEntryModel> RequestedEntriesDictionaryByIdentifier { get; private set; } = new Dictionary<string, IRequestedEntryModel>();
+        public IDictionary<string, IRequestedEntryModel> RequestedEntriesDictionaryByName { get; private set; } = new Dictionary<string, IRequestedEntryModel>();
         public void AddEntry(RequestedEntryModel entry) {
             var identifier = entry.GetIdentifier();
-            if (!RequestedEntriesDictionary.ContainsKey(identifier)) {
+            if (!RequestedEntriesDictionaryByIdentifier.ContainsKey(identifier)) {
                 RequestedEntries.Add(entry);
-                RequestedEntriesDictionary.Add(identifier, entry);
+                RequestedEntriesDictionaryByIdentifier.Add(identifier, entry);
+                RequestedEntriesDictionaryByName.Add(entry.Name, entry);
             }
         }
 
-        public bool TryGetRequestedEntry(string name, out IRequestedEntryModel requestedEntry) {
-            return RequestedEntriesDictionary.TryGetValue(name, out requestedEntry);
+        public bool TryGetRequestedEntryByIdentifier(string identifier, out IRequestedEntryModel requestedEntry) {
+            return RequestedEntriesDictionaryByIdentifier.TryGetValue(identifier, out requestedEntry);
+        }
+
+        public bool TryGetRequestedEntryByName(string name, out IRequestedEntryModel requestedEntry) {
+            return RequestedEntriesDictionaryByName.TryGetValue(name, out requestedEntry);
         }
 
         public bool TryMarkFileAsSerialized(string name) {

@@ -19,6 +19,7 @@ namespace BundleSink.TagHelpers
         private readonly WebpackEntriesViewData _webpackViewData;
         private readonly IFileVersionProvider _fileVersionProvider;
         private readonly IWebHostEnvironment _webHostEnvironment;
+        private readonly bool _shouldPrintOutComments = true;
 
         [ViewContext]
         public ViewContext ViewContext { get; set; }
@@ -50,6 +51,11 @@ namespace BundleSink.TagHelpers
             }
 
             var finalOutput = "";
+
+            if (_shouldPrintOutComments) {
+                finalOutput += $"<!-- Sink \"{_sinkName}\" -->\n";
+            }
+
             foreach (var requestEntry in _webpackViewData.RequestedEntries.Where(x => x.Sink == _sinkName))
             {
                 finalOutput += GetEntryOutput(requestEntry);
@@ -58,7 +64,7 @@ namespace BundleSink.TagHelpers
             output.PostElement.AppendHtml(finalOutput);
         }
 
-        private string GetEntryOutput(IRequestedEntryModel requestedEntry) {
+        private string GetEntryOutput(IRequestedEntryModel requestedEntry, string dependencyOf = null) {
             var finalOutput = "";
 
             if (_webpackViewData.TryMarkEntryAsSerialized(requestedEntry)) {
@@ -66,32 +72,50 @@ namespace BundleSink.TagHelpers
                 // Prevent importing if no script requires this one
                 if (requestedEntry.RequiredBy.Any()) {
                     var dependants = requestedEntry.RequiredBy
-                        .Where(dependant => _webpackViewData.TryGetRequestedEntry(dependant, out var _));
+                        .Where(dependant => _webpackViewData.TryGetRequestedEntryByName(dependant, out var _));
                     if (!dependants.Any()) {
-                        if (_webHostEnvironment.IsDevelopment()) {
+                        if (_shouldPrintOutComments) {
                             finalOutput += $"<!-- Preventing output of {requestedEntry.GetIdentifier()} because there are no dependants. -->\n";
                         }
                         return finalOutput;
-                    }   
+                    }
                 }
-                
+
                 // Resolve requirements
                 foreach (var requirement in requestedEntry.Requires)
                 {
                     IRequestedEntryModel requirementEntry;
-                    if (!_webpackViewData.TryGetRequestedEntry(requirement, out requirementEntry))
+
+                    // Check if the dependency has been requested
+                    if (!_webpackViewData.TryGetRequestedEntryByName(requirement, out requirementEntry))
                     {
-                        var requirementEntryModel = RequestedEntryModel.BuildWebpackEntry(requirement);
-                        requirementEntryModel.Sink = _sinkName;
-                        requirementEntry = requirementEntryModel;
+                        // If not, try build a new request for entry from webpack
+                        if (_webpackManifest.Value.ContainsKey(requirement)) {
+                            var requirementEntryModel = RequestedEntryModel.BuildWebpackEntry(requirement);
+                            requirementEntryModel.Sink = _sinkName;
+                            requirementEntry = requirementEntryModel;
+                        }
                     }
-                    finalOutput += GetEntryOutput(requirementEntry);
+
+                    if (requirementEntry != null)
+                    {
+                        finalOutput += GetEntryOutput(requirementEntry, requestedEntry.Name);
+                    }
+                    else
+                    {
+                        if (_shouldPrintOutComments)
+                        {
+                            finalOutput += $"<!-- Cannot resolve \"{requirement}\" requested by \"{requestedEntry.Name}\". -->\n";
+                        }
+                    }
+
+                    
                 }
 
                 if (_webpackManifest.Value.TryGetValue(requestedEntry.Name, out var entryFiles))
                 {
-                    finalOutput += SerializeEntryJS(requestedEntry, entryFiles);
-                    finalOutput += SerializeEntryCSS(requestedEntry, entryFiles);
+                    finalOutput += SerializeEntryJS(requestedEntry, entryFiles, dependencyOf);
+                    finalOutput += SerializeEntryCSS(requestedEntry, entryFiles, dependencyOf);
                 }
             }
 
@@ -99,7 +123,7 @@ namespace BundleSink.TagHelpers
             return finalOutput;
         }
 
-        private string SerializeEntryJS(IRequestedEntryModel requestedEntry, WebpackEntryModel webpackEntry) {
+        private string SerializeEntryJS(IRequestedEntryModel requestedEntry, WebpackEntryModel webpackEntry, string dependencyOf = null) {
             var finalOutput = "";
             if (!requestedEntry.CSSOnly)
             {
@@ -124,12 +148,21 @@ namespace BundleSink.TagHelpers
                         if (_settings.AppendVersion)
                             filePath = _fileVersionProvider.AddFileVersionToPath(ViewContext.HttpContext.Request.PathBase, filePath);
 
+                        var comments = "";
+                        if (_shouldPrintOutComments) {
+                            // Requested due to being a dependency
+                            if (requestedEntry.Sink != _sinkName && !string.IsNullOrEmpty(dependencyOf)) {
+                                comments += $"<!-- The following entry should be printed into \"{requestedEntry.Sink}\" sink. However it has been requested as a dependency of \"{dependencyOf}\". -->\n";
+                            }
+                        }
+
                         finalOutput += string.Format(
-                            "<script type=\"text/javascript\" src=\"{0}\"{1}{2}{3}></script>\n",
+                            "{0}<script type=\"text/javascript\" src=\"{1}\"{2}{3}{4}></script>\n",
+                            comments,
                             filePath,
                             !string.IsNullOrEmpty(async) ? " " + async : "",
                             !string.IsNullOrEmpty(defer) ? " " + defer : "",
-                            _settings.PrintAllAttributes ? SerializeEntryAttributes(requestedEntry) : ""
+                            _settings.PrintAllAttributes ? SerializeEntryAttributes(requestedEntry, dependencyOf) : ""
                         );
                     }
                 }
@@ -137,7 +170,7 @@ namespace BundleSink.TagHelpers
             return finalOutput;
         }
 
-        private string SerializeEntryCSS(IRequestedEntryModel requestedEntry, WebpackEntryModel webpackEntry)
+        private string SerializeEntryCSS(IRequestedEntryModel requestedEntry, WebpackEntryModel webpackEntry, string dependencyOf = null)
         {
             var finalOutput = "";
             if (!requestedEntry.JSOnly)
@@ -158,10 +191,21 @@ namespace BundleSink.TagHelpers
                         if (_settings.AppendVersion)
                             filePath = _fileVersionProvider.AddFileVersionToPath(ViewContext.HttpContext.Request.PathBase, filePath);
 
+                        var comments = "";
+                        if (_shouldPrintOutComments)
+                        {
+                            // Requested due to being a dependency
+                            if (requestedEntry.Sink != _sinkName && !string.IsNullOrEmpty(dependencyOf))
+                            {
+                                comments += $"<!-- The following entry should be printed into \"{requestedEntry.Sink}\" sink. However it has been requested as a dependency of \"{dependencyOf}\". -->\n";
+                            }
+                        }
+
                         finalOutput += string.Format(
-                            "<link rel=\"stylesheet\" href=\"{0}\"{1}></script>\n",
+                            "{0}<link rel=\"stylesheet\" href=\"{1}\"{2} />\n",
+                            comments,
                             filePath,
-                            _settings.PrintAllAttributes ? SerializeEntryAttributes(requestedEntry) : ""
+                            _settings.PrintAllAttributes ? SerializeEntryAttributes(requestedEntry, dependencyOf) : ""
                         );
                     }
                 }
@@ -169,19 +213,21 @@ namespace BundleSink.TagHelpers
             return finalOutput;
         }
 
-        private string SerializeEntryAttributes(IRequestedEntryModel requestedEntry) {
+        private string SerializeEntryAttributes(IRequestedEntryModel requestedEntry, string dependencyOf = null) {
             var shouldPrintKeyAttribute = !string.IsNullOrEmpty(requestedEntry.Key);
             var shouldPrintSinkAttribute = !string.IsNullOrEmpty(requestedEntry.Sink);
+            var shouldPrintRequestedBy = !string.IsNullOrEmpty(dependencyOf);
             var shouldPrintRequiresAttribute = requestedEntry.Requires.Any();
             var shouldPrintRequiredByAttribute = requestedEntry.RequiredBy.Any();
             var shouldPrintCSSOnlyAttribute = requestedEntry.CSSOnly;
             var shouldPrintJSOnlyAttribute = requestedEntry.JSOnly;
 
             return string.Format(
-                "{0}{1}{2}",
+                "{0}{1}{2}{3}{4}{5}{6}{7}",
                 $" entry=\"{requestedEntry.Name}\"",
                 shouldPrintKeyAttribute ? $" key=\"{requestedEntry.Key}\"" : "",
                 shouldPrintSinkAttribute ? $" sink=\"{requestedEntry.Sink}\"" : "",
+                shouldPrintRequestedBy ? $" dependency-of=\"{dependencyOf}\"" : "",
                 shouldPrintRequiresAttribute ? $" requires=\"{String.Join(',', requestedEntry.Requires)}\"" : "",
                 shouldPrintRequiredByAttribute ? $" required-by=\"{String.Join(',', requestedEntry.RequiredBy)}\"" : "",
                 shouldPrintCSSOnlyAttribute ? $" css-only" : "",

@@ -6,5 +6,6 @@ namespace BundleSink.Models
         public string PublicOutputPath { get; set; }
         public bool AppendVersion { get; set; }
         public bool PrintAllAttributes { get; set; }
+        public bool PrintComments { get; set; }
     }
 }

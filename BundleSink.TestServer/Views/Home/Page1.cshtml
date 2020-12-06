@@ -1,10 +1,10 @@
 <h2>Page 1</h2>
 
-<webpack-entry name="page-a" requires="page-a-style" />
-<webpack-entry name="page-a-style" required-by="page-a" />
+@* <webpack-entry name="page-a" requires="page-a-style" /> *@
+<webpack-entry name="page-a-style" sink="BELOW" required-by="page-a" requires="does-not-exist" />
 
-@* <webpack-entry name="page-a" key="1" sink="ABOVE" defer />
-<webpack-entry name="page-b" key="2" sink="BELOW" async defer/> *@
+<webpack-entry name="page-a" key="1" defer requires="page-a-style" />
+@* <webpack-entry name="page-a" key="2" sink="BELOW" async defer/> *@
 
 @section Scripts {
     <script src="https://cdn.jsdelivr.net/npm/vue@2.6.12/dist/vue.js"></script>
