@@ -1,5 +1,7 @@
 # BundleSink
 
+![.NET Core](https://github.com/Wufe/bundle-sink/workflows/.NET%20Core/badge.svg)
+
 Manage multiple webpack entries within an ASPNET Core application.
 
 ***
