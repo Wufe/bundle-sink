@@ -79,5 +79,9 @@ namespace BundleSink.TestServer.Controllers
         public IActionResult DuplicateLiteralEntriesTest() {
             return View();
         }
+
+        public IActionResult DependencyDeclaringLiteralsTest() {
+            return View();
+        }
     }
 }

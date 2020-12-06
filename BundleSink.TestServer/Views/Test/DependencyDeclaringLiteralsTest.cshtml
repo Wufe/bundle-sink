@@ -1,0 +1,29 @@
+@{
+    Layout = null;
+}
+
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>DependencyDeclaringLiteralsTest</title>
+</head>
+
+<body>
+    <webpack-entry name="page-a" required-by="literal" />
+    <literal-entry name="literal">
+        <script>
+            console.log('literal 1')
+        </script>
+    </literal-entry>
+    <literal-entry name="literal">
+        <script>
+            console.log('literal 2')
+        </script>
+    </literal-entry>
+    <sink />
+</body>
+
+</html>

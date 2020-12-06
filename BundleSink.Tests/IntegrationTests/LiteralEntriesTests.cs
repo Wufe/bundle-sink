@@ -73,5 +73,30 @@ namespace BundleSink.Tests.IntegrationTests
                     !string.IsNullOrEmpty(script.TextContent) &&
                     script.TextContent.Contains("console.log('simple entry')"));
         }
+
+        [Fact]
+        public async Task DependencyDeclaringLiterals_ShouldPrintLiteralsAndDependency()
+        {
+            var page1 = await _client.GetAsync("/Test/DependencyDeclaringLiteralsTest");
+            var content = await HtmlHelpers.GetDocumentAsync(page1);
+            var scripts = HtmlHelpers.GetScripts(content);
+
+            // Act
+
+            // Assert
+            Assert.Equal(3, scripts.Count);
+            Assert.Single(scripts,
+                script =>
+                    !string.IsNullOrEmpty(script.Source) &&
+                    script.Source.Contains("page-a"));
+            Assert.Single(scripts,
+                script =>
+                    !string.IsNullOrEmpty(script.TextContent) &&
+                    script.TextContent.Contains("literal 1')"));
+            Assert.Single(scripts,
+                script =>
+                    !string.IsNullOrEmpty(script.TextContent) &&
+                    script.TextContent.Contains("literal 2')"));
+        }
     }
 }

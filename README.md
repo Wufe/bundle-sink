@@ -129,6 +129,17 @@ At the same time you can mark an entry with the `required-by` attribute, which t
 
 ***
 
+## Literal entries
+
+You may want to use this library as a native ASPNET Core section, but with added functionalities:  
+you can use the `<literal-entry>` tag helper.  
+
+Its usage is the same as native section or environment tag helper.  
+
+This helper supports `name`, `key`, `sink`, `requires` and `required-by` attributes.
+
+***
+
 ## Partial builds
 
 You may want to build one entry at a time, in order to speed up development processes.
@@ -211,8 +222,3 @@ module.exports = env => {
 ```
 
 ***
-
-## TODO
-
-- Tag helper for generic JS files
-- Tag helper for JS excerpts ( literal JS `<script>` tags )
