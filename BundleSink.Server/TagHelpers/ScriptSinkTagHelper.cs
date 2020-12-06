@@ -19,7 +19,6 @@ namespace BundleSink.TagHelpers
         private readonly WebpackEntriesViewData _webpackViewData;
         private readonly IFileVersionProvider _fileVersionProvider;
         private readonly IWebHostEnvironment _webHostEnvironment;
-        private readonly bool _shouldPrintOutComments = true;
 
         [ViewContext]
         public ViewContext ViewContext { get; set; }
@@ -52,7 +51,7 @@ namespace BundleSink.TagHelpers
 
             var finalOutput = "";
 
-            if (_shouldPrintOutComments) {
+            if (_settings.PrintComments) {
                 finalOutput += $"<!-- Sink \"{_sinkName}\" -->\n";
             }
 
@@ -74,7 +73,7 @@ namespace BundleSink.TagHelpers
                     var dependants = requestedEntry.RequiredBy
                         .Where(dependant => _webpackViewData.TryGetRequestedEntryByName(dependant, out var _));
                     if (!dependants.Any()) {
-                        if (_shouldPrintOutComments) {
+                        if (_settings.PrintComments) {
                             finalOutput += $"<!-- Preventing output of {requestedEntry.GetIdentifier()} because there are no dependants. -->\n";
                         }
                         return finalOutput;
@@ -103,7 +102,7 @@ namespace BundleSink.TagHelpers
                     }
                     else
                     {
-                        if (_shouldPrintOutComments)
+                        if (_settings.PrintComments)
                         {
                             finalOutput += $"<!-- Cannot resolve \"{requirement}\" requested by \"{requestedEntry.Name}\". -->\n";
                         }
@@ -149,7 +148,7 @@ namespace BundleSink.TagHelpers
                             filePath = _fileVersionProvider.AddFileVersionToPath(ViewContext.HttpContext.Request.PathBase, filePath);
 
                         var comments = "";
-                        if (_shouldPrintOutComments) {
+                        if (_settings.PrintComments) {
                             // Requested due to being a dependency
                             if (requestedEntry.Sink != _sinkName && !string.IsNullOrEmpty(dependencyOf)) {
                                 comments += $"<!-- The following entry should be printed into \"{requestedEntry.Sink}\" sink. However it has been requested as a dependency of \"{dependencyOf}\". -->\n";
@@ -192,7 +191,7 @@ namespace BundleSink.TagHelpers
                             filePath = _fileVersionProvider.AddFileVersionToPath(ViewContext.HttpContext.Request.PathBase, filePath);
 
                         var comments = "";
-                        if (_shouldPrintOutComments)
+                        if (_settings.PrintComments)
                         {
                             // Requested due to being a dependency
                             if (requestedEntry.Sink != _sinkName && !string.IsNullOrEmpty(dependencyOf))
