@@ -242,7 +242,7 @@ namespace BundleSink.Tests.IntegrationTests
         public async Task SinkBeforeNestedContentWithEntry_ShouldPrintTheEntryEvenThoughTheSinkHasBeenDeclaredBeforeTheRenderBodyFunction()
         {
             // Arrange
-            var page1 = await _client.GetAsync("/Test/SinkBeforeNestedContentWithEntry");
+            var page1 = await _client.GetAsync("/Test/SinkBeforeNestedContentWithEntryTest");
             var content = await HtmlHelpers.GetDocumentAsync(page1);
             var scripts = HtmlHelpers.GetScripts(content);
             var links = HtmlHelpers.GetLinks(content);
@@ -262,7 +262,7 @@ namespace BundleSink.Tests.IntegrationTests
         public async Task SinkBeforeNestedContentWithNestedEntries_ShouldPrintTheNestedEntriesEvenThoughTheSinkHasBeenDeclaredBeforeTheRenderBodyFunction()
         {
             // Arrange
-            var page1 = await _client.GetAsync("/Test/SinkBeforeNestedContentWithNestedEntries");
+            var page1 = await _client.GetAsync("/Test/SinkBeforeNestedContentWithNestedEntriesTest");
             var content = await HtmlHelpers.GetDocumentAsync(page1);
             var scripts = HtmlHelpers.GetScripts(content);
             var links = HtmlHelpers.GetLinks(content);

@@ -51,11 +51,11 @@ namespace BundleSink.TestServer.Controllers
             return View();
         }
 
-        public IActionResult SinkBeforeNestedContentWithEntry() {
+        public IActionResult SinkBeforeNestedContentWithEntryTest() {
             return View();
         }
 
-        public IActionResult SinkBeforeNestedContentWithNestedEntries()
+        public IActionResult SinkBeforeNestedContentWithNestedEntriesTest()
         {
             return View();
         }
