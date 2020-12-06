@@ -13,6 +13,8 @@ using Microsoft.Extensions.Options;
 
 namespace BundleSink.TagHelpers
 {
+    [HtmlTargetElement("script-sink")]
+    [HtmlTargetElement("sink")]
     public class ScriptSinkTagHelper : TagHelper {
         private readonly BundleSinkSettings _settings;
         private readonly IOptionsSnapshot<WebpackEntriesManifest> _webpackManifest;

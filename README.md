@@ -67,7 +67,7 @@ public static IHostBuilder CreateHostBuilder(string[] args) =>
 
 ## Usage
 
-- Place a script-sink in your `_Layout.cshtml` or a razor page's "Scripts" section:  
+- Place a sink in your `_Layout.cshtml` or a razor page's "Scripts" section:  
 
 *e.g.:  
 
@@ -75,7 +75,7 @@ public static IHostBuilder CreateHostBuilder(string[] args) =>
 <h1>Homepage</h1>
 
 @section Scripts {
-    <script-sink />
+    <sink />
 }
 ```
 
@@ -91,7 +91,7 @@ This is a partial view from the homepage
 
 ## What happened
 The `<webpack-entry>` tag helper marked the specified entry as a dependency.  
-The `<script-sink>` tag helper uses the dependencies declared all over the razor pages, taking care of duplicates and required chunks
+The `<sink>` tag helper uses the dependencies declared all over the razor pages, taking care of duplicates and required chunks
 
 The html will contain the scripts required for the selected entries, with their hash appended as query string.  
 *e.g.*
@@ -111,14 +111,14 @@ The webpack-entry accepts more options in form of attributes
 - Use the attribute `js-only` to use js assets only
 
 **Named sinks**  
-You can also render a webpack-entry to a specific script-sink:
-- Use the `name` attribute on the script-sink tag helper
+You can also render a webpack-entry to a specific sink:
+- Use the `name` attribute on the sink tag helper
 - Use the `sink` attribute on the webpack-entry tag helper
 
 *e.g.*
 ```razor
 <webpack-entry sink="ABOVE" />
-<script-sink name="ABOVE />
+<sink name="ABOVE />
 ```
 
 **Dependencies**  
