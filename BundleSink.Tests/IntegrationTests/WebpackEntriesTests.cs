@@ -281,5 +281,47 @@ namespace BundleSink.Tests.IntegrationTests
                     script.Source.Contains("page-b"));
 
         }
+
+        [Fact]
+        public async Task WebpackEntryWithCSSOnlyAttribute_ShouldPrintCSSOnly()
+        {
+            // Arrange
+            var page1 = await _client.GetAsync("/Test/WebpackEntryWithCSSOnlyAttributeTest");
+            var content = await HtmlHelpers.GetDocumentAsync(page1);
+            var scripts = HtmlHelpers.GetScripts(content);
+            var links = HtmlHelpers.GetLinks(content);
+
+            // Act
+
+            // Assert
+            Assert.Equal(0, scripts.Count);
+            Assert.Equal(1, links.Count);
+
+            Assert.Single(links,
+                links =>
+                    links.Href.Contains("page-c"));
+
+        }
+
+        [Fact]
+        public async Task WebpackEntryWithJSOnlyAttribute_ShouldPrintJSOnly()
+        {
+            // Arrange
+            var page1 = await _client.GetAsync("/Test/WebpackEntryWithJSOnlyAttributeTest");
+            var content = await HtmlHelpers.GetDocumentAsync(page1);
+            var scripts = HtmlHelpers.GetScripts(content);
+            var links = HtmlHelpers.GetLinks(content);
+
+            // Act
+
+            // Assert
+            Assert.Equal(1, scripts.Count);
+            Assert.Equal(0, links.Count);
+
+            Assert.Single(scripts,
+                scripts =>
+                    scripts.Source.Contains("page-c"));
+
+        }
     }
 }

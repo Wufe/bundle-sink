@@ -32,7 +32,7 @@ namespace BundleSink
 
                     services.AddSingleton(settings);
                     services.Configure<WebpackEntriesManifest>(builderContext.Configuration.GetSection(WebpackEntriesManifest.SECTION_NAME));
-                    services.AddScoped<WebpackEntriesViewData>();
+                    services.AddScoped<EntriesViewData>();
                 });
         }
 

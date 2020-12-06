@@ -55,7 +55,15 @@ namespace BundleSink.TestServer.Controllers
             return View();
         }
 
-        public IActionResult SinkBeforeNestedContentWithNestedEntriesTest()
+        public IActionResult SinkBeforeNestedContentWithNestedEntriesTest() {
+            return View();
+        }
+
+        public IActionResult WebpackEntryWithCSSOnlyAttributeTest() {
+            return View();
+        }
+
+        public IActionResult WebpackEntryWithJSOnlyAttributeTest()
         {
             return View();
         }

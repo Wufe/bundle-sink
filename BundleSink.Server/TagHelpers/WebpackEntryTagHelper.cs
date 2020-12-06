@@ -7,15 +7,15 @@ namespace BundleSink.TagHelpers
 {
     public class WebpackEntryTagHelper : TagHelper {
         private readonly IOptionsSnapshot<WebpackEntriesManifest> _webpackManifest;
-        private readonly WebpackEntriesViewData _webpackViewData;
+        private readonly EntriesViewData _viewData;
 
         public WebpackEntryTagHelper(
             IOptionsSnapshot<WebpackEntriesManifest> webpackManifest,
-            WebpackEntriesViewData webpackViewData
+            EntriesViewData viewData
         )
         {
             _webpackManifest = webpackManifest;
-            _webpackViewData = webpackViewData;
+            _viewData = viewData;
         }
 
         public override void Process(TagHelperContext context, TagHelperOutput output)
@@ -59,7 +59,7 @@ namespace BundleSink.TagHelpers
                         entry.RequiredBy = requiredBy.Value.ToString().Split(',');
                     }
 
-                    _webpackViewData.AddEntry(entry);
+                    _viewData.AddEntry(entry);
                 }
             }
         }

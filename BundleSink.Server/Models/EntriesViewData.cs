@@ -4,7 +4,7 @@ using BundleSink.Models.Entry;
 
 namespace BundleSink.Models
 {
-    public class WebpackEntriesViewData {
+    public class EntriesViewData {
         public IDictionary<string, bool> SerializedFiles { get; private set; } = new Dictionary<string, bool>();
 
         // A Collection to iterate over

@@ -18,7 +18,7 @@ namespace BundleSink.TagHelpers
     public class ScriptSinkTagHelper : TagHelper {
         private readonly BundleSinkSettings _settings;
         private readonly IOptionsSnapshot<WebpackEntriesManifest> _webpackManifest;
-        private readonly WebpackEntriesViewData _webpackViewData;
+        private readonly EntriesViewData _viewData;
         private readonly IFileVersionProvider _fileVersionProvider;
         private readonly IWebHostEnvironment _webHostEnvironment;
 
@@ -30,14 +30,14 @@ namespace BundleSink.TagHelpers
         public ScriptSinkTagHelper(
             BundleSinkSettings settings,
             IOptionsSnapshot<WebpackEntriesManifest> webpackManifest,
-            WebpackEntriesViewData webpackViewData,
+            EntriesViewData viewData,
             IFileVersionProvider fileVersionProvider,
             IWebHostEnvironment webHostEnvironment
         )
         {
             _settings = settings;
             _webpackManifest = webpackManifest;
-            _webpackViewData = webpackViewData;
+            _viewData = viewData;
             _fileVersionProvider = fileVersionProvider;
             _webHostEnvironment = webHostEnvironment;
         }
@@ -57,7 +57,7 @@ namespace BundleSink.TagHelpers
                 finalOutput += $"<!-- Sink \"{_sinkName}\" -->\n";
             }
 
-            foreach (var requestEntry in _webpackViewData.RequestedEntries.Where(x => x.Sink == _sinkName))
+            foreach (var requestEntry in _viewData.RequestedEntries.Where(x => x.Sink == _sinkName))
             {
                 finalOutput += GetEntryOutput(requestEntry);
             }
@@ -68,12 +68,12 @@ namespace BundleSink.TagHelpers
         private string GetEntryOutput(IRequestedEntryModel requestedEntry, string dependencyOf = null) {
             var finalOutput = "";
 
-            if (_webpackViewData.TryMarkEntryAsSerialized(requestedEntry)) {
+            if (_viewData.TryMarkEntryAsSerialized(requestedEntry)) {
 
                 // Prevent importing if no script requires this one
                 if (requestedEntry.RequiredBy.Any()) {
                     var dependants = requestedEntry.RequiredBy
-                        .Where(dependant => _webpackViewData.TryGetRequestedEntryByName(dependant, out var _));
+                        .Where(dependant => _viewData.TryGetRequestedEntryByName(dependant, out var _));
                     if (!dependants.Any()) {
                         if (_settings.PrintComments) {
                             finalOutput += $"<!-- Preventing output of \"{requestedEntry.GetIdentifier()}\" because there are no dependants. -->\n";
@@ -88,7 +88,7 @@ namespace BundleSink.TagHelpers
                     IRequestedEntryModel requirementEntry;
 
                     // Check if the dependency has been requested
-                    if (!_webpackViewData.TryGetRequestedEntryByName(requirement, out requirementEntry))
+                    if (!_viewData.TryGetRequestedEntryByName(requirement, out requirementEntry))
                     {
                         // If not, try build a new request for entry from webpack
                         if (_webpackManifest.Value.ContainsKey(requirement)) {
@@ -139,7 +139,7 @@ namespace BundleSink.TagHelpers
                     if (!fileIsADependency && requestedEntry.Key != null)
                         serializedFileSearchKey += requestedEntry.Key;
 
-                    if (_webpackViewData.TryMarkFileAsSerialized(serializedFileSearchKey))
+                    if (_viewData.TryMarkFileAsSerialized(serializedFileSearchKey))
                     {
                         var async = !fileIsADependency && requestedEntry.Async ? "async" : "";
                         var defer = !fileIsADependency && requestedEntry.Defer ? "defer" : "";
@@ -185,7 +185,7 @@ namespace BundleSink.TagHelpers
                     if (requestedEntry.Key != null)
                         serializedFileSearchKey += requestedEntry.Key;
 
-                    if (_webpackViewData.TryMarkFileAsSerialized(serializedFileSearchKey))
+                    if (_viewData.TryMarkFileAsSerialized(serializedFileSearchKey))
                     {
                         var filePath = Path.Combine("/", _settings.PublicOutputPath, file);
 
