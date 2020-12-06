@@ -74,7 +74,7 @@ namespace BundleSink.TagHelpers
                         .Where(dependant => _webpackViewData.TryGetRequestedEntryByName(dependant, out var _));
                     if (!dependants.Any()) {
                         if (_settings.PrintComments) {
-                            finalOutput += $"<!-- Preventing output of {requestedEntry.GetIdentifier()} because there are no dependants. -->\n";
+                            finalOutput += $"<!-- Preventing output of \"{requestedEntry.GetIdentifier()}\" because there are no dependants. -->\n";
                         }
                         return finalOutput;
                     }

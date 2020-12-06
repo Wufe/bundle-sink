@@ -1,0 +1,20 @@
+@{
+    Layout = null;
+}
+
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>SameEntryDifferentKey</title>
+</head>
+
+<body>
+    <webpack-entry name="page-a" key=1 />
+    <webpack-entry name="page-a" key=2 />
+    <script-sink />
+</body>
+
+</html>

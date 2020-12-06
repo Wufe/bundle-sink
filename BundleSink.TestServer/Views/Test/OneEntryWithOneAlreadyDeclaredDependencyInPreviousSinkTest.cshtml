@@ -1,0 +1,21 @@
+@{
+    Layout = null;
+}
+
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>OneEntryWithOneAlreadyDeclaredDependencyInPreviousSinkTest</title>
+</head>
+
+<body>
+    <webpack-entry name="page-a-style" sink="above" />
+    <webpack-entry name="page-a" requires="page-a-style" sink="below" />
+    <script-sink name="above" />
+    <script-sink name="below" />
+</body>
+
+</html>
