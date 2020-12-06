@@ -16,7 +16,13 @@ namespace BundleSink.Models.Entry
         ICollection<string> RequiredBy { get; }
 
         bool IsWebpackEntry(out IRequestedWebpackEntryModel webpackEntryModel);
+        bool IsLiteralEntry(out IRequestedLiteralEntryModel literalEntryModel);
     }
 
     public interface IRequestedWebpackEntryModel : IRequestedEntryModel {}
+
+    public interface IRequestedLiteralEntryModel : IRequestedEntryModel {
+        string Content { get; set; }
+        string LiteralHash { get; set; }
+    }
 }

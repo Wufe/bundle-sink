@@ -17,7 +17,7 @@ namespace BundleSink.Models
             if (!RequestedEntriesDictionaryByIdentifier.ContainsKey(identifier)) {
                 RequestedEntries.Add(entry);
                 RequestedEntriesDictionaryByIdentifier.Add(identifier, entry);
-                RequestedEntriesDictionaryByName.TryAdd(entry.Name, entry);
+                RequestedEntriesDictionaryByName.TryAdd(entry.Name ?? identifier, entry);
             }
         }
 

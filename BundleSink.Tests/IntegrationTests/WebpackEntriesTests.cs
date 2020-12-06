@@ -11,12 +11,12 @@ using Xunit;
 
 namespace BundleSink.Tests.IntegrationTests
 {
-    public class WebpackEntriesTests : IClassFixture<CustomWebApplicationFactory<BundleSink.TestServer.Startup>> {
+    public class WebpackEntriesTests : IClassFixture<CustomWebApplicationFactory<Startup>> {
         private readonly CustomWebApplicationFactory<Startup> _factory;
         private readonly HttpClient _client;
 
         public WebpackEntriesTests(
-            CustomWebApplicationFactory<BundleSink.TestServer.Startup> factory
+            CustomWebApplicationFactory<Startup> factory
         )
         {
             _factory = factory;
@@ -298,8 +298,8 @@ namespace BundleSink.Tests.IntegrationTests
             Assert.Equal(1, links.Count);
 
             Assert.Single(links,
-                links =>
-                    links.Href.Contains("page-c"));
+                link =>
+                    link.Href.Contains("page-c"));
 
         }
 
@@ -319,8 +319,8 @@ namespace BundleSink.Tests.IntegrationTests
             Assert.Equal(0, links.Count);
 
             Assert.Single(scripts,
-                scripts =>
-                    scripts.Source.Contains("page-c"));
+                script =>
+                    script.Source.Contains("page-c"));
 
         }
     }

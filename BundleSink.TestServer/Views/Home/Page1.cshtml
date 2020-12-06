@@ -4,6 +4,11 @@
 <webpack-entry name="page-a-style" sink="BELOW" required-by="page-a" requires="does-not-exist" />
 
 <webpack-entry name="page-a" key="1" defer requires="page-a-style" />
+<literal-entry>
+    <script>
+        console.log('test');
+    </script>
+</literal-entry>
 @* <webpack-entry name="page-a" key="2" sink="BELOW" async defer/> *@
 
 @section Scripts {

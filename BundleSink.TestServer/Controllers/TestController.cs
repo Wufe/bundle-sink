@@ -67,5 +67,17 @@ namespace BundleSink.TestServer.Controllers
         {
             return View();
         }
+
+        public IActionResult SimpleLiteralEntryTest() {
+            return View();
+        }
+
+        public IActionResult LiteralEntryWithDependencyTest() {
+            return View();
+        }
+
+        public IActionResult DuplicateLiteralEntriesTest() {
+            return View();
+        }
     }
 }

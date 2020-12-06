@@ -4,6 +4,7 @@ using System.IO;
 using System.Linq;
 using BundleSink.Models;
 using BundleSink.Models.Entry;
+using BundleSink.Server.Serializers;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.AspNetCore.Mvc.ViewFeatures;
@@ -27,6 +28,8 @@ namespace BundleSink.TagHelpers
 
         private string _sinkName;
 
+        private Serializer _serializer;
+
         public ScriptSinkTagHelper(
             BundleSinkSettings settings,
             IOptionsSnapshot<WebpackEntriesManifest> webpackManifest,
@@ -46,6 +49,15 @@ namespace BundleSink.TagHelpers
         {
             output.TagName = null;
             _sinkName = RequestedEntryModel.DEFAULT_SINK_NAME;
+
+            _serializer = new Serializer(
+                _settings,
+                _webpackManifest,
+                _viewData,
+                _fileVersionProvider,
+                ViewContext.HttpContext.Request.PathBase,
+                _sinkName
+            );
 
             if (context.AllAttributes.TryGetAttribute("name", out var name)) {
                 _sinkName = name.Value.ToString();
@@ -109,15 +121,11 @@ namespace BundleSink.TagHelpers
                             finalOutput += $"<!-- Cannot resolve \"{requirement}\" requested by \"{requestedEntry.Name}\". -->\n";
                         }
                     }
-
-                    
                 }
 
-                if (_webpackManifest.Value.TryGetValue(requestedEntry.Name, out var entryFiles))
-                {
-                    finalOutput += SerializeEntryJS(requestedEntry, entryFiles, dependencyOf);
-                    finalOutput += SerializeEntryCSS(requestedEntry, entryFiles, dependencyOf);
-                }
+                finalOutput += _serializer.SerializeEntry(requestedEntry, dependencyOf);
+
+                
             }
 
             
@@ -215,6 +223,7 @@ namespace BundleSink.TagHelpers
         }
 
         private string SerializeEntryAttributes(IRequestedEntryModel requestedEntry, string dependencyOf = null) {
+            var shouldPrintEntryAttribute = !string.IsNullOrEmpty(requestedEntry.Name);
             var shouldPrintKeyAttribute = !string.IsNullOrEmpty(requestedEntry.Key);
             var shouldPrintSinkAttribute = !string.IsNullOrEmpty(requestedEntry.Sink);
             var shouldPrintRequestedBy = !string.IsNullOrEmpty(dependencyOf);
@@ -225,7 +234,7 @@ namespace BundleSink.TagHelpers
 
             return string.Format(
                 "{0}{1}{2}{3}{4}{5}{6}{7}",
-                $" entry=\"{requestedEntry.Name}\"",
+                shouldPrintEntryAttribute ? $" entry=\"{requestedEntry.Name}\"" : "",
                 shouldPrintKeyAttribute ? $" key=\"{requestedEntry.Key}\"" : "",
                 shouldPrintSinkAttribute ? $" sink=\"{requestedEntry.Sink}\"" : "",
                 shouldPrintRequestedBy ? $" dependency-of=\"{dependencyOf}\"" : "",
