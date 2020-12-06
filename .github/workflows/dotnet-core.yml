@@ -1,0 +1,41 @@
+name: .NET Core
+
+on:
+  push:
+    branches: [ master ]
+  pull_request:
+    branches: [ master ]
+
+jobs:
+  build:
+
+    runs-on: ubuntu-latest
+
+    steps:
+    - uses: actions/checkout@v2
+    - name: Setup .NET Core
+      uses: actions/setup-dotnet@v1
+      with:
+        dotnet-version: 3.1.301
+    - name: Use Node.js 12
+      uses: actions/setup-node@v1
+      with:
+        node-version: '12'
+    - name: Install dotnet core dependencies
+      run: |
+        cd BundleSink.TestServer
+        dotnet restore
+    - name: Install npm dependencies
+      run: |
+        cd BundleSink.TestServer
+        npm install
+    - name: Build webpack entries
+      run: |
+        cd BundleSink.TestServer
+        npm run build
+#    - name: Build
+#      run: dotnet build --configuration Release --no-restore
+    - name: Test
+      run: |
+        cd BundleSink.Tests
+        dotnet test --verbosity normal
