@@ -323,5 +323,32 @@ namespace BundleSink.Tests.IntegrationTests
                     script.Source.Contains("page-c"));
 
         }
+
+        [Fact]
+        public async Task WebpackEntryWithTwoChunksAndStyle_ShouldPrintTwoScriptsAndOneLink()
+        {
+            // Arrange
+            var page1 = await _client.GetAsync("/Test/WebpackEntryWithTwoChunksAndStyleTest");
+            var content = await HtmlHelpers.GetDocumentAsync(page1);
+            var scripts = HtmlHelpers.GetScripts(content);
+            var links = HtmlHelpers.GetLinks(content);
+
+            // Act
+
+            // Assert
+            Assert.Equal(2, scripts.Count);
+            Assert.Equal(1, links.Count);
+
+            Assert.Single(scripts,
+                script =>
+                    script.Source.Contains("page-e"));
+            Assert.Single(scripts,
+                script =>
+                    script.Source.Contains("node_modules"));
+            Assert.Single(links,
+                link =>
+                    link.Href.Contains("page-e"));
+
+        }
     }
 }

@@ -68,6 +68,10 @@ namespace BundleSink.TestServer.Controllers
             return View();
         }
 
+        public IActionResult WebpackEntryWithTwoChunksAndStyleTest() {
+            return View();
+        }
+
         public IActionResult SimpleLiteralEntryTest() {
             return View();
         }
@@ -81,6 +85,14 @@ namespace BundleSink.TestServer.Controllers
         }
 
         public IActionResult DependencyDeclaringLiteralsTest() {
+            return View();
+        }
+
+        public IActionResult DependencyWithTwoScriptsAndOneLinkDeclaringLiteralsTest() {
+            return View();
+        }
+
+        public IActionResult DependencyWithTwoScriptsAndOneLinkDeclaringLiteralsWithoutLiteralsTest() {
             return View();
         }
     }

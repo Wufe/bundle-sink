@@ -8,17 +8,17 @@ const mode = process.env.NODE_ENV === 'production' ?
 
 module.exports = env => {
 
-    let entry = {
-        'page-a': './Client/page-a/index.ts',
-        'page-b': './Client/page-b/index.ts',
-        'page-c': './Client/page-c/index.ts',
-        'page-a-style': './Styles/page-a-style.scss',
-    };
-
     const bundleSinkWebpackPlugin = new BundleSinkWebpackPlugin({
         clean: true,
         output: path.resolve(__dirname, 'wwwroot/dist/client-manifest.json'),
-        entry,
+        entry: {
+            'page-a': './Client/page-a/index.ts',
+            'page-b': './Client/page-b/index.ts',
+            'page-c': './Client/page-c/index.ts',
+            'page-a-style': './Styles/page-a-style.scss',
+            'page-d': './Client/page-d/index.ts',
+            'page-e': './Client/page-e/index.ts'
+        },
         env
     });
     

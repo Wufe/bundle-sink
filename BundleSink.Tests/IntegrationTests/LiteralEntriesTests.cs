@@ -1,6 +1,7 @@
 using System;
 using System.Net.Http;
 using System.Threading.Tasks;
+using AngleSharp.Dom;
 using BundleSink.Tests.Helpers;
 using BundleSink.TestServer;
 using Microsoft.AspNetCore.Mvc.Testing;
@@ -97,6 +98,59 @@ namespace BundleSink.Tests.IntegrationTests
                 script =>
                     !string.IsNullOrEmpty(script.TextContent) &&
                     script.TextContent.Contains("literal 2')"));
+        }
+
+        [Fact]
+        public async Task DependencyWithTwoScriptsAndOneLinkDeclaringLiterals_ShouldPrintLiteralsAndDependencyWithItsScriptsAndLink()
+        {
+            var page1 = await _client.GetAsync("/Test/DependencyWithTwoScriptsAndOneLinkDeclaringLiteralsTest");
+            var content = await HtmlHelpers.GetDocumentAsync(page1);
+            var scripts = HtmlHelpers.GetScripts(content);
+            var links = HtmlHelpers.GetLinks(content);
+
+            // Act
+
+            // Assert
+            Assert.Equal(4, scripts.Count);
+            Assert.Equal(1, links.Count);
+            Assert.Single(scripts,
+                script =>
+                    !string.IsNullOrEmpty(script.Source) &&
+                    script.Source.Contains("page-e"));
+            Assert.Single(scripts,
+                script =>
+                    !string.IsNullOrEmpty(script.Source) &&
+                    script.Source.Contains("node_modules"));
+            Assert.Single(scripts,
+                script =>
+                    !string.IsNullOrEmpty(script.TextContent) &&
+                    script.TextContent.Contains("literal 1')"));
+            Assert.Single(scripts,
+                script =>
+                    !string.IsNullOrEmpty(script.TextContent) &&
+                    script.TextContent.Contains("literal 2')"));
+            Assert.Single(links,
+                link =>
+                    link.Href.Contains("page-e"));
+        }
+
+        [Fact]
+        public async Task DependencyWithTwoScriptsAndOneLinkDeclaringLiteralsWithoutLiterals_ShouldPreventPrintingEverything()
+        {
+            var page1 = await _client.GetAsync("/Test/DependencyWithTwoScriptsAndOneLinkDeclaringLiteralsWithoutLiteralsTest");
+            var content = await HtmlHelpers.GetDocumentAsync(page1);
+            var scripts = HtmlHelpers.GetScripts(content);
+            var links = HtmlHelpers.GetLinks(content);
+
+            // Act
+
+            // Assert
+            Assert.Equal(0, scripts.Count);
+            Assert.Equal(0, links.Count);
+
+            Assert.Single(content.Descendents<IComment>(),
+                comment =>
+                    comment.TextContent.Contains("Preventing output of \"page-e\" because there are no dependants."));
         }
     }
 }
