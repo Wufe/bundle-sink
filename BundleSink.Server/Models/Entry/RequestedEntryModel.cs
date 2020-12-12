@@ -79,5 +79,12 @@ namespace BundleSink.Models.Entry
             }
             return hashedValue;
         }
+
+        public bool Processed { get; set; } = false;
+
+        public void MarkAsProcessed(bool processed = true)
+        {
+            Processed = processed;
+        }
     }
 }

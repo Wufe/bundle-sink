@@ -1,5 +1,4 @@
 using System.Collections.Generic;
-using System.Linq;
 using BundleSink.Models.Entry;
 
 namespace BundleSink.Models
@@ -43,6 +42,7 @@ namespace BundleSink.Models
             var identifier = requestedEntry.GetIdentifier();
             if (!SerializedEntries.ContainsKey(identifier)) {
                 SerializedEntries.Add(identifier, requestedEntry);
+                requestedEntry.MarkAsProcessed();
                 return true;
             }
             return false;

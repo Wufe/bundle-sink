@@ -1,5 +1,7 @@
 <h2>Page 1</h2>
 
+<webpack-entry name="page-a" sink="ciccio" />
+<sink name="ciccio" />
 @* <webpack-entry name="page-a" requires="page-a-style" /> *@
 <webpack-entry name="page-a-style" sink="BELOW" required-by="page-a" requires="does-not-exist" />
 

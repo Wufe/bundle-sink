@@ -5,6 +5,8 @@ using Microsoft.Extensions.DependencyInjection;
 using BundleSink.Models;
 using System;
 using BundleSink.Configuration;
+using Microsoft.Extensions.Options;
+using Microsoft.AspNetCore.Mvc;
 
 namespace BundleSink
 {
@@ -28,11 +30,13 @@ namespace BundleSink
                         AppendVersion = configuration.AppendVersion,
                         PrintAllAttributes = configuration.PrintAdditionalAttributesCondition(builderContext.HostingEnvironment),
                         PrintComments = configuration.PrintCommentsCondition(builderContext.HostingEnvironment),
+                        CheckIntegrity = configuration.IntegrityCheckCondition(builderContext.HostingEnvironment)
                     };
 
                     services.AddSingleton(settings);
                     services.Configure<WebpackEntriesManifest>(builderContext.Configuration.GetSection(WebpackEntriesManifest.SECTION_NAME));
                     services.AddScoped<EntriesViewData>();
+                    services.AddSingleton<IConfigureOptions<MvcOptions>, ConfigureMvcOptions>();
                 });
         }
 

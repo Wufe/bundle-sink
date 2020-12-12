@@ -17,6 +17,9 @@ namespace BundleSink.Models.Entry
 
         bool IsWebpackEntry(out IRequestedWebpackEntryModel webpackEntryModel);
         bool IsLiteralEntry(out IRequestedLiteralEntryModel literalEntryModel);
+
+        bool Processed { get; set; }
+        void MarkAsProcessed(bool processed = true);
     }
 
     public interface IRequestedWebpackEntryModel : IRequestedEntryModel {}
