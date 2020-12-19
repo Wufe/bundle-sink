@@ -1,5 +1,5 @@
 const path = require('path');
-const BundleSinkWebpackPlugin = require('../BundleSink.WebpackPlugin');
+const BundleSinkWebpackPlugin = require('bundle-sink-webpack-plugin');
 const MiniCssExtractPlugin = require('mini-css-extract-plugin');
 const FixStyleOnlyEntriesPlugin = require('webpack-fix-style-only-entries');
 
