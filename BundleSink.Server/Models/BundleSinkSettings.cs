@@ -8,5 +8,6 @@ namespace BundleSink.Models
         public bool PrintAllAttributes { get; set; }
         public bool PrintComments { get; set; }
         public bool CheckIntegrity { get; set; }
+        public bool RewriteOutput { get; set; }
     }
 }

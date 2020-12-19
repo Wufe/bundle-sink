@@ -14,6 +14,7 @@ Manage static assets within an ASP.NET Core application complying with common en
     * [Usage](#usage)
         * [The result](#the-result)
         * [Pay attention to execution order](#pay-attention-to-execution-order)
+        * [Rewrite output mode](#rewrite-output-mode)
 * [Additional options](#additional-options)
     * [Literal entries](#literal-entries)
     * [Partial builds](#partial-builds)
@@ -133,6 +134,30 @@ At the same time, having the `entry` and the `sink` in the same page source **ca
 <webpack-entry name="homepage">
 <sink />
 ```
+
+If you really need to declare sinks and entries in different ways, you can try enabling the [Rewrite output mode](#rewrite-output-mode).
+
+***
+
+## Rewrite output mode
+
+There's a mode you can activate that allows to declare entries and sinks in the order you prefer.  
+This mode is called `RewriteOutput` and can be enabled while configuring bundle sink:
+
+```csharp
+webBuilder
+    .ConfigureBundleSink(builder =>
+    {
+        builder.RewriteOutput = true;
+        builder.WithWebpack("wwwroot/dist/client-manifest.json", "/dist/");
+    });
+```
+
+This modality is a little **hacky**: mocks the HttpContext.Response.Body to allow it to be read from a custom ResultFilter.  
+The performance implication of this operation has not been measured.  
+
+**Use it at your own risk.**
+
 ***
 
 # Additional options

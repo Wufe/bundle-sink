@@ -9,12 +9,14 @@ using Xunit;
 
 namespace BundleSink.Tests.IntegrationTests
 {
-    public class LiteralEntriesTests : IClassFixture<CustomWebApplicationFactory<Startup>> {
-        private readonly CustomWebApplicationFactory<Startup> _factory;
+    public abstract class Base_LiteralEntries_Tests<TWebApplicationFactory> :
+        IClassFixture<TWebApplicationFactory>
+        where TWebApplicationFactory : WebApplicationFactory<Startup> {
+        private readonly TWebApplicationFactory _factory;
         private readonly HttpClient _client;
 
-        public LiteralEntriesTests(
-            CustomWebApplicationFactory<BundleSink.TestServer.Startup> factory
+        public Base_LiteralEntries_Tests(
+            TWebApplicationFactory factory
         )
         {
             _factory = factory;

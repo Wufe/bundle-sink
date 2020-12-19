@@ -18,8 +18,11 @@ namespace BundleSink.Configuration
         
         public void Configure(MvcOptions options)
         {
-            if (_settings.CheckIntegrity) {
-                options.Filters.Add(typeof(IntegrityCheckerResultFilterAttribute));
+            if (_settings.RewriteOutput) {
+                options.Filters.Add(typeof(BodyRewriteResultFilter));
+            } else {
+                if (_settings.CheckIntegrity)
+                    options.Filters.Add(typeof(IntegrityCheckerResultFilterAttribute));
             }
         }
     }

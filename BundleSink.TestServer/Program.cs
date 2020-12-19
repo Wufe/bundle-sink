@@ -22,6 +22,8 @@ namespace BundleSink.TestServer
                 {
                     webBuilder
                         .ConfigureBundleSink(builder => {
+                            builder.RewriteOutput = true;
+                            builder.IntegrityCheckCondition = _ => true;
                             builder.WithWebpack("wwwroot/dist/client-manifest.json", "/dist/");
                         })
                         .UseStartup<Startup>()

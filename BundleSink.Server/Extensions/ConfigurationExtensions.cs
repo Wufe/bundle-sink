@@ -7,6 +7,7 @@ using System;
 using BundleSink.Configuration;
 using Microsoft.Extensions.Options;
 using Microsoft.AspNetCore.Mvc;
+using BundleSink.Services;
 
 namespace BundleSink
 {
@@ -30,12 +31,15 @@ namespace BundleSink
                         AppendVersion = configuration.AppendVersion,
                         PrintAllAttributes = configuration.PrintAdditionalAttributesCondition(builderContext.HostingEnvironment),
                         PrintComments = configuration.PrintCommentsCondition(builderContext.HostingEnvironment),
-                        CheckIntegrity = configuration.IntegrityCheckCondition(builderContext.HostingEnvironment)
+                        CheckIntegrity = configuration.IntegrityCheckCondition(builderContext.HostingEnvironment),
+                        RewriteOutput = configuration.RewriteOutput
                     };
 
                     services.AddSingleton(settings);
+                    services.AddHttpContextAccessor();
                     services.Configure<WebpackEntriesManifest>(builderContext.Configuration.GetSection(WebpackEntriesManifest.SECTION_NAME));
                     services.AddScoped<EntriesViewData>();
+                    services.AddTransient<SinkService>();
                     services.AddSingleton<IConfigureOptions<MvcOptions>, ConfigureMvcOptions>();
                 });
         }

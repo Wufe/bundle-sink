@@ -95,5 +95,9 @@ namespace BundleSink.TestServer.Controllers
         public IActionResult DependencyWithTwoScriptsAndOneLinkDeclaringLiteralsWithoutLiteralsTest() {
             return View();
         }
+
+        public IActionResult SinkBeforeWebpackEntryTest() {
+            return View();
+        }
     }
 }

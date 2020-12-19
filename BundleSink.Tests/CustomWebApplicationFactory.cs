@@ -4,8 +4,7 @@ using Microsoft.Extensions.Hosting;
 
 namespace BundleSink.Tests
 {
-    #region snippet1
-    public class CustomWebApplicationFactory<TStartup>
+    public class NoRewriteWebApplicationFactory<TStartup>
         : WebApplicationFactory<TStartup> where TStartup : class
     {
         protected override void ConfigureWebHost(IWebHostBuilder webBuilder)
@@ -18,5 +17,20 @@ namespace BundleSink.Tests
                 });
         }
     }
-    #endregion
+
+    public class RewriteWebApplicationFactory<TStartup>
+        : WebApplicationFactory<TStartup> where TStartup : class
+    {
+        protected override void ConfigureWebHost(IWebHostBuilder webBuilder)
+        {
+            webBuilder
+                .ConfigureBundleSink(builder =>
+                {
+                    builder.PrintAdditionalAttributesCondition = environment => true;
+                    builder.PrintCommentsCondition = environment => true;
+                    builder.RewriteOutput = true;
+                    builder.WithWebpack("wwwroot/dist/client-manifest.json", "/dist/");
+                });
+        }
+    }
 }

@@ -12,6 +12,7 @@ namespace BundleSink.Configuration
         Func<IWebHostEnvironment, bool> PrintAdditionalAttributesCondition { get; set; }
         Func<IWebHostEnvironment, bool> PrintCommentsCondition { get; set; }
         Func<IWebHostEnvironment, bool> IntegrityCheckCondition { get; set; }
+        bool RewriteOutput { get; set; }
         ISinkConfiguration WithWebpack(string manifestName, string publicOutputPath);
     }
 
@@ -22,6 +23,8 @@ namespace BundleSink.Configuration
         public string WebpackPublicOutputPath { get; set; } = "";
 
         public bool AppendVersion { get; set; } = true;
+
+        public bool RewriteOutput { get; set; } = false;
 
         public Func<IWebHostEnvironment, bool> PrintAdditionalAttributesCondition { get; set; } =
             environment => environment.IsDevelopment();
