@@ -10,7 +10,7 @@ namespace BundleSink.Services
 {
     public class SinkService {
         private readonly BundleSinkSettings _settings;
-        private readonly IOptionsSnapshot<WebpackEntriesManifest> _webpackManifest;
+        private readonly EntriesManifest _webpackManifest;
         private readonly EntriesViewData _viewData;
         private readonly IFileVersionProvider _fileVersionProvider;
         private readonly IHttpContextAccessor _httpContextAccessor;
@@ -18,7 +18,7 @@ namespace BundleSink.Services
 
         public SinkService(
             BundleSinkSettings settings,
-            IOptionsSnapshot<WebpackEntriesManifest> webpackManifest,
+            EntriesManifest webpackManifest,
             EntriesViewData viewData,
             IFileVersionProvider fileVersionProvider,
             IHttpContextAccessor httpContextAccessor
