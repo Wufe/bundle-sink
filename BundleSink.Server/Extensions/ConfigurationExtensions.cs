@@ -32,7 +32,8 @@ namespace BundleSink
                         PrintAllAttributes = configuration.PrintAdditionalAttributesCondition(builderContext.HostingEnvironment),
                         PrintComments = configuration.PrintCommentsCondition(builderContext.HostingEnvironment),
                         CheckIntegrity = configuration.IntegrityCheckCondition(builderContext.HostingEnvironment),
-                        RewriteOutput = configuration.RewriteOutput
+                        RewriteOutput = configuration.RewriteOutput,
+                        UsePlainIOptions = configuration.UsePlainIOptionsCondition(builderContext.HostingEnvironment),
                     };
 
                     services.AddSingleton(settings);
@@ -41,6 +42,13 @@ namespace BundleSink
                     services.AddScoped<EntriesViewData>();
                     services.AddTransient<SinkService>();
                     services.AddSingleton<IConfigureOptions<MvcOptions>, ConfigureMvcOptions>();
+
+                    if (settings.UsePlainIOptions) {
+                        services.AddScoped<EntriesManifest>(sp => new EntriesManifest(sp.GetRequiredService<IOptions<WebpackEntriesManifest>>().Value));
+                    } else {
+                        services.AddScoped<EntriesManifest>(sp => new EntriesManifest(sp.GetRequiredService<IOptionsSnapshot<WebpackEntriesManifest>>().Value));
+                    }
+
                 });
         }
 

@@ -2,6 +2,7 @@ using System;
 using System.Linq;
 using BundleSink.Models;
 using BundleSink.Models.Entry;
+using BundleSink.Services;
 using Microsoft.AspNetCore.Mvc.ViewFeatures;
 using Microsoft.Extensions.Options;
 
@@ -9,7 +10,7 @@ namespace BundleSink.Server.Serializers
 {
     public partial class Serializer {
         private readonly BundleSinkSettings _settings;
-        private readonly IOptionsSnapshot<WebpackEntriesManifest> _webpackManifest;
+        private readonly EntriesManifest _webpackManifest;
         private readonly EntriesViewData _viewData;
         private readonly IFileVersionProvider _fileVersionProvider;
         private readonly string _pathBase;
@@ -18,7 +19,7 @@ namespace BundleSink.Server.Serializers
 
         public Serializer(
             BundleSinkSettings settings,
-            IOptionsSnapshot<WebpackEntriesManifest> webpackManifest,
+            EntriesManifest webpackManifest,
             EntriesViewData viewData,
             IFileVersionProvider fileVersionProvider,
             string pathBase,

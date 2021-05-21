@@ -35,6 +35,9 @@ namespace BundleSink.Configuration
         public Func<IWebHostEnvironment, bool> IntegrityCheckCondition { get; set; } =
             environment => environment.IsDevelopment();
 
+        public Func<IWebHostEnvironment, bool> UsePlainIOptionsCondition { get; set; } =
+            environment => !environment.IsDevelopment();
+
         public ISinkConfiguration WithWebpack(string manifestName, string publicOutputPath)
         {
             UseWebpack = true;
