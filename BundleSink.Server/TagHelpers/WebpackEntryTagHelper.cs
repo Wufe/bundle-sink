@@ -1,20 +1,21 @@
 using BundleSink.Models;
 using BundleSink.Models.Entry;
+using BundleSink.Services;
 using Microsoft.AspNetCore.Razor.TagHelpers;
 using Microsoft.Extensions.Options;
 
 namespace BundleSink.TagHelpers
 {
     public class WebpackEntryTagHelper : TagHelper {
-        private readonly IOptionsSnapshot<WebpackEntriesManifest> _webpackManifest;
+        private readonly EntriesManifest _entriesManifest;
         private readonly EntriesViewData _viewData;
 
         public WebpackEntryTagHelper(
-            IOptionsSnapshot<WebpackEntriesManifest> webpackManifest,
+            EntriesManifest entriesManifest,
             EntriesViewData viewData
         )
         {
-            _webpackManifest = webpackManifest;
+            _entriesManifest = entriesManifest;
             _viewData = viewData;
         }
 
@@ -23,7 +24,7 @@ namespace BundleSink.TagHelpers
             output.TagName = null;
             if (context.AllAttributes.TryGetAttribute("name", out var name)) {
                 var entryName = name.Value.ToString();
-                if (_webpackManifest.Value.ContainsKey(entryName)) {
+                if (_entriesManifest.Value.ContainsKey(entryName)) {
 
                     var entry = RequestedEntryModel.BuildWebpackEntry(entryName);
 
